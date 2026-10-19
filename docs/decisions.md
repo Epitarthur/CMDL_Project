@@ -65,3 +65,9 @@ dimensions expose assessed/unassessed coverage; exact checks remain T16.
 These are concrete defaults for review, not independent contributor approvals.
 Florian's T01 approval does not imply approval of this new T04 package. See
 `contracts.md`, `database-schema.md` and `api/examples.json`.
+
+## T04 schema approval (2026-10-19)
+
+Florian reviewed and approved `cmdl-storage-v1` ("schema looks good"). The database
+schema is frozen for implementation. API contract/payload review remains pending;
+T04 stays open until that remaining review is recorded.

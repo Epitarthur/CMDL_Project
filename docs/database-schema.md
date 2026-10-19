@@ -5,6 +5,10 @@ T07 and snapshots T08. This document specifies the constraints those implementat
 must enforce. It does not claim tables have been created. Benchmark semantics are
 [`deskdrop-temporal-v1`](benchmark-proposal.md).
 
+Approved by Florian on 2026-10-19 following review of this schema. This freezes
+`cmdl-storage-v1` for subsequent implementation. API payload approval is tracked
+separately under T04; no additional contributor signatures are claimed.
+
 ## Types and naming
 
 Source `person_id`, `content_id` and session identifiers are **TEXT**, matching

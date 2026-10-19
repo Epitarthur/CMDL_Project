@@ -50,7 +50,7 @@ Tickets are local planning records, not GitHub Issues. Owners are defaults. Depe
 
 ### [ ] T04 — Freeze schema and service payloads
 
-**Ready for review (2026-10-19):** `docs/database-schema.md` specifies `cmdl-storage-v1` entities, keys, publication rules and indexes. `docs/contracts.md` and `docs/api/openapi.json` specify `cmdl-api-v1`: seven routes, quality score semantics, version matching, deterministic fallback, review idempotency and errors. `docs/api/examples.json` contains 23 illustrative examples with lineage. OpenAPI, payload and cross-field fixture checks pass. Human review of the representative examples is still required; no contributor signatures are claimed. No migrations or services have been implemented by T04.
+**Schema approved; API review pending (2026-10-19):** Florian approved `cmdl-storage-v1`. `docs/database-schema.md` specifies `cmdl-storage-v1` entities, keys, publication rules and indexes. `docs/contracts.md` and `docs/api/openapi.json` specify `cmdl-api-v1`: seven routes, quality score semantics, version matching, deterministic fallback, review idempotency and errors. `docs/api/examples.json` contains 23 illustrative examples with lineage. OpenAPI, payload and cross-field fixture checks pass. Review of the API payload examples is still required; the schema approval does not imply API approval or additional contributor signatures. No migrations or services have been implemented by T04.
 
 **Owner:** Florian + Arthur + Charly + Youssef  
 **Depends on:** T01, T02
