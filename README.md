@@ -5,12 +5,23 @@ Deskdrop article recommendation with metadata quality evaluation.
 ## Current state
 
 Python package, locked development tooling, CI workflow and a tested source-data
-profiler are implemented. Application services, models, database migrations and
-Docker services remain planned. T01–T03 are complete: benchmark v1 is approved,
+profiler are implemented. Docker Compose now provides PostgreSQL, a FastAPI
+bootstrap and a Streamlit development status screen. Models, database migrations
+and product API/UI features remain planned. T01–T03 are complete: benchmark v1 is approved,
 dataset version/license and presentation counts are verified, and CI has passed.
-T04’s database schema and API contract are approved. T01–T04 are complete.
+T04’s database schema and API contract are approved. T01–T05 are complete; the environment has passed local Docker verification.
 
-## Planned stack
+## Local services
+
+```sh
+cp .env.example .env
+docker compose up --build -d --wait
+```
+
+Open [Streamlit](http://localhost:8501). See [startup, jobs, persistence and reset](docs/compose.md).
+Application readiness returns 503 until later tickets provide snapshots and rankings.
+
+## Stack
 
 Python, PostgreSQL, FastAPI, Streamlit and Docker Compose. The complete demo should
 run on a teammate’s laptop. Preparation and training run as explicit batch jobs.

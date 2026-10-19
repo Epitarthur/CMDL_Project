@@ -1,0 +1,63 @@
+name: cmdl
+x-app: &app
+  image: cmdl-dev:local
+  build: .
+  init: true
+services:
+  db:
+    image: postgres:17@sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-cmdl}
+      POSTGRES_USER: ${POSTGRES_USER:-cmdl}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cmdl-local-development}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+  api:
+    <<: *app
+    environment:
+      PGHOST: db
+      PGDATABASE: ${POSTGRES_DB:-cmdl}
+      PGUSER: ${POSTGRES_USER:-cmdl}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-cmdl-local-development}
+    ports:
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+  ui:
+    <<: *app
+    command: [streamlit, run, src/cmdl/ui/app.py, --server.address=0.0.0.0, --server.port=8501, --browser.gatherUsageStats=false]
+    environment:
+      API_BASE_URL: http://api:8000
+    ports:
+      - "127.0.0.1:${UI_PORT:-8501}:8501"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8501/_stcore/health', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+  job:
+    <<: *app
+    profiles: [jobs]
+    command: [cmdl, profile]
+    volumes:
+      - ./data/raw:/app/data/raw:ro
+      - ./artifacts:/app/artifacts
+volumes:
+  postgres_data:

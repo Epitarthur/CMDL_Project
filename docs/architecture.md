@@ -1,8 +1,8 @@
 # Architecture
 
 One repository, one Python application with separate modules, one PostgreSQL database.
-Docker Compose will run PostgreSQL, FastAPI and Streamlit. Batch preparation and
-training jobs run explicitly. No scheduler, Redis, pgvector or authentication initially.
+Docker Compose runs PostgreSQL, a FastAPI bootstrap and a Streamlit status screen.
+Batch preparation and training jobs run explicitly. No scheduler, Redis, pgvector or authentication initially.
 Pin runtime and dependency versions when implementation starts.
 
 ## Data flow
@@ -35,5 +35,7 @@ source file checksum and row number. Distinguish import idempotency from genuine
 source duplicate handling. Do not infer publication dates from sharing timestamps.
 
 The entity/key/version design is specified in [database contract v1](database-schema.md),
-with [API contracts and examples](contracts.md). T04’s artifacts were approved by Florian on 2026-10-19. Executable migrations are T06 and service implementation is T21; Compose
-remains T05. T04 introduces no running database or HTTP services.
+with [API contracts and examples](contracts.md). T04’s artifacts were approved by Florian
+on 2026-10-19. Executable migrations are T06 and service implementation is T21.
+The T05 [development environment](compose.md) adds infrastructure and connectivity checks.
+Product data services remain for their implementation tickets.

@@ -7,7 +7,13 @@ name = "cmdl"
 version = "0.1.0"
 description = "Deskdrop recommendation and metadata quality evaluation"
 requires-python = ">=3.12,<3.13"
-dependencies = []
+dependencies = [
+    "fastapi>=0.146.0",
+    "httpx>=0.28.1",
+    "psycopg[binary]>=3.3.6",
+    "streamlit>=1.66.0",
+    "uvicorn[standard]>=0.54.0",
+]
 
 [project.scripts]
 cmdl = "cmdl.cli:main"

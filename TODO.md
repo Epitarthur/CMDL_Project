@@ -1,6 +1,6 @@
 # Project TODO and implementation tickets
 
-Status: T01–T03 completed on 2026-10-19 following Florian’s explicit approval and closure instruction. Benchmark v1 is frozen, publisher version/license and current slide counts are verified, and tooling/CI pass. T04’s schema and API contract are approved and complete; T05 onward remain planned.
+Status: T01–T03 completed on 2026-10-19 following Florian’s explicit approval and closure instruction. Benchmark v1 is frozen, publisher version/license and current slide counts are verified, and tooling/CI pass. T04’s schema and API contract are approved and complete; T05’s Docker environment is implemented and locally verified; T06 onward remain planned.
 
 Tickets are local planning records, not GitHub Issues. Owners are defaults. Dependencies use ticket numbers; work within a phase may proceed in parallel when dependencies permit. Update status and link implementation commits/PRs and evidence as work completes.
 
@@ -59,7 +59,7 @@ Tickets are local planning records, not GitHub Issues. Owners are defaults. Depe
 
 **Validate / acceptance:** Team reviews representative examples; contracts preserve large IDs, ordered rankings and matching metadata/check/model/snapshot versions.
 
-### [ ] T05 — Create Docker Compose development environment
+### [x] T05 — Create Docker Compose development environment
 
 **Owner:** Florian + Youssef  
 **Depends on:** T03, T04
@@ -67,6 +67,12 @@ Tickets are local planning records, not GitHub Issues. Owners are defaults. Depe
 **Implement / produce:** Add database, API and Streamlit images/services, persistent database volume, health/readiness checks and environment example. Add explicit batch job commands; document startup and reset. No auth, scheduler or Redis initially.
 
 **Validate / acceptance:** On a clean laptop setup starts successfully; UI reaches API and database; data persists after restart; reset behavior is explicit and repeatable.
+
+**Evidence (2026-10-19):** Fresh isolated Compose volume/image setup on Florian’s
+Docker engine passed UI → API → SQL connectivity, honest 503 application readiness,
+restart/recreation persistence and volume-reset checks. Explicit source-profile job
+passed. 66 tests and Ruff pass. The smoke check is included in CI; a separate
+teammate laptop run is not claimed. See [environment guide](docs/compose.md).
 
 ## Data and reproducibility
 

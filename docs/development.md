@@ -5,8 +5,8 @@
 Use Python 3.12.13 (`.python-version`) and uv 0.12.23 (also pinned in CI).
 `uv sync --locked` installs the editable `src/cmdl` package and the locked development
 dependencies. Runtime profiling uses only the standard library. Hatchling 1.27.0 is
-pinned as the build backend. Future API/model packages should add dependencies when
-implemented rather than installing the entire planned stack now.
+pinned as the build backend. The T05 runtime now includes FastAPI, Uvicorn, Psycopg,
+Streamlit and HTTPX; model packages remain for later tickets. See [Docker services](compose.md).
 
 ## Commands
 
@@ -77,8 +77,9 @@ in `evidence/slide-reconciliation.json`. These commands do not modify the inputs
 
 ## T04 contract validation
 
-The dev lockfile includes JSON Schema and OpenAPI validators; the application still
-has no runtime dependencies. The ordinary `uv run pytest` CI command now validates
+The dev lockfile includes JSON Schema and OpenAPI validators. The application had
+no runtime dependencies at T04; T05 adds the service runtime. The ordinary
+`uv run pytest` CI command now validates
 `docs/api/openapi.json`, all 23 illustrative request/response examples, their embedded
 OpenAPI copies, and example snapshot/metadata/model/feature/check relationships.
 
@@ -89,3 +90,18 @@ metadata, incompatible model/quality versions, and incomplete coverage with an
 apparently complete aggregate. These check the design artifacts; migrations and live
 API enforcement are T06/T21. Readiness, ordering and review persistence still need
 runtime integration tests once those services exist.
+
+
+## T05 environment validation — 2026-10-19
+
+66 tests pass, including bootstrap readiness/error-contract checks. Ruff lint and
+format checks pass. The isolated Compose smoke run verifies fresh database startup,
+the actual Streamlit script reaching the API and PostgreSQL, 503 product readiness,
+a standalone profiling job, persistence across DB restart and Compose recreation,
+and an empty database after explicit volume deletion. The normal development stack
+also starts healthy, and the documented host-user batch command writes its profile
+to the host artifacts directory. Original tracked data remains unchanged.
+
+The smoke test is now part of the GitHub workflow. Local evidence uses Docker on
+Florian’s machine; it does not claim a manual run on another teammate’s laptop.
+See [Compose commands and reset semantics](compose.md).
