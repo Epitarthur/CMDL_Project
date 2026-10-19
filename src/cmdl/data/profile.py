@@ -2,6 +2,7 @@
 
 import csv
 import hashlib
+import io
 import json
 import re
 from bisect import bisect_right
@@ -36,13 +37,13 @@ def utc(timestamp: int) -> str:
 
 def read_source(path: Path, expected: dict) -> tuple[list[dict], dict]:
     columns, events = SCHEMAS[path.name]
-    with path.open("rb") as handle:
-        digest = hashlib.file_digest(handle, "sha256").hexdigest()
-    if digest != expected["sha256"] or path.stat().st_size != expected["bytes"]:
+    payload = path.read_bytes()
+    digest = hashlib.sha256(payload).hexdigest()
+    if digest != expected["sha256"] or len(payload) != expected["bytes"]:
         raise ProfileError(f"{path.name}: checksum or byte count differs from manifest")
     rows = []
     try:
-        with path.open(newline="", encoding="utf-8") as handle:
+        with io.StringIO(payload.decode("utf-8"), newline="") as handle:
             reader = csv.DictReader(handle, strict=True)
             if reader.fieldnames != columns:
                 raise ProfileError(f"{path.name}: unexpected CSV header {reader.fieldnames!r}")
@@ -50,6 +51,8 @@ def read_source(path: Path, expected: dict) -> tuple[list[dict], dict]:
                 where = f"{path.name}: data row {row_number}"
                 if None in row or any(value is None for value in row.values()):
                     raise ProfileError(f"{where}: wrong number of fields")
+                if any("\x00" in value for value in row.values()):
+                    raise ProfileError(f"{where}: NUL characters cannot be stored as text")
                 if row["eventType"] not in events:
                     raise ProfileError(f"{where}: unknown eventType {row['eventType']!r}")
                 for column in columns:
@@ -70,7 +73,7 @@ def read_source(path: Path, expected: dict) -> tuple[list[dict], dict]:
     duplicates = Counter(tuple(row[column] for column in columns) for row in rows)
     summary = {
         "sha256": digest,
-        "bytes": path.stat().st_size,
+        "bytes": len(payload),
         "rows": len(rows),
         "columns": columns,
         "grain": (
@@ -102,8 +105,8 @@ def read_source(path: Path, expected: dict) -> tuple[list[dict], dict]:
     return rows, summary
 
 
-def profile(raw_dir: Path) -> dict:
-    """Verify the manifest and calculate source-level counts without excluding rows."""
+def load_sources(raw_dir: Path) -> tuple[dict, dict[str, list[dict]], dict[str, dict]]:
+    """Validate both files; parse the exact in-memory bytes whose hashes were checked."""
     try:
         manifest = json.loads((raw_dir / "manifest.json").read_text())
         entries = {entry["file"]: entry for entry in manifest["files"]}
@@ -122,6 +125,21 @@ def profile(raw_dir: Path) -> dict:
     interaction_rows, interactions = read_source(
         raw_dir / "users_interactions.csv", entries["users_interactions.csv"]
     )
+    return (
+        manifest,
+        {
+            "shared_articles.csv": article_rows,
+            "users_interactions.csv": interaction_rows,
+        },
+        {"shared_articles.csv": articles, "users_interactions.csv": interactions},
+    )
+
+
+def profile(raw_dir: Path) -> dict:
+    """Verify the manifest and calculate source-level counts without excluding rows."""
+    manifest, rows, stats = load_sources(raw_dir)
+    article_rows, interaction_rows = rows["shared_articles.csv"], rows["users_interactions.csv"]
+    articles, interactions = stats["shared_articles.csv"], stats["users_interactions.csv"]
     timelines = defaultdict(list)
     for row in article_rows:
         timelines[row["contentId"]].append((int(row["timestamp"]), row["eventType"]))

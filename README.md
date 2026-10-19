@@ -7,9 +7,10 @@ Deskdrop article recommendation with metadata quality evaluation.
 Python package, locked development tooling, CI workflow and a tested source-data
 profiler are implemented. Docker Compose now provides PostgreSQL, a FastAPI
 bootstrap and a Streamlit development status screen. PostgreSQL migrations
-implement the approved storage schema. Models and product API/UI features remain planned. T01–T03 are complete: benchmark v1 is approved,
+implement the approved storage schema. CSV ingestion preserves source lineage and
+produces a repeatable exclusion audit. Models and product API/UI features remain planned. T01–T03 are complete: benchmark v1 is approved,
 dataset version/license and presentation counts are verified, and CI has passed.
-T04’s database schema and API contract are approved. T01–T06 are complete; the environment and migrations have passed local Docker verification.
+T04’s database schema and API contract are approved. T01–T07 are complete; ingestion, migrations and the environment pass local verification.
 
 ## Local services
 
@@ -17,6 +18,7 @@ T04’s database schema and API contract are approved. T01–T06 are complete; t
 cp .env.example .env
 docker compose up --build -d --wait
 docker compose --profile jobs run --rm job cmdl migrate
+docker compose --profile jobs run --rm --user "$(id -u):$(id -g)" job cmdl ingest
 ```
 
 Open [Streamlit](http://localhost:8501). See [startup, jobs, persistence and reset](docs/compose.md).
@@ -40,7 +42,7 @@ run on a teammate’s laptop. Preparation and training run as explicit batch job
 - [Decisions and open questions](docs/decisions.md)
 - [Approved benchmark v1](docs/benchmark-proposal.md)
 - [Dataset provenance and attribution](docs/dataset-provenance.md)
-- [Source manifest](data/raw/manifest.json)
+- [Source manifest](data/raw/manifest.json) and [ingestion commands and audit](docs/ingestion.md)
 
 Original CSVs are tracked under `data/raw/`. Derived data, models and rankings are
 local outputs and are excluded from Git. Keep original source files unchanged.

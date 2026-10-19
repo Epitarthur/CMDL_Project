@@ -177,3 +177,13 @@ T06 makes two publication details explicit on 2026-10-19: file event category an
 ranking-set status. These additive columns enforce the existing category/publication
 rules; benchmark and API semantics are unchanged. Exact JSON encodings, transition
 rules and validation evidence are documented in [migrations](migrations.md).
+
+
+## Successful source imports (T07)
+
+Migration 0002 adds `source_imports` with UUID `import_id`, import/protocol versions,
+article/interaction file hash FKs, the original source manifest, an exclusion report
+(JSONB), and processing `created_at`. The version/protocol/hash tuple is unique;
+rows are append-only. It commits with both files' normalized events and metadata so
+replays can verify completion and regenerate exports. This additive audit table
+preserves the approved storage/benchmark semantics. See [ingestion](ingestion.md).

@@ -54,8 +54,14 @@ Apply the schema after starting the database:
 docker compose --profile jobs run --rm job cmdl migrate
 ```
 
-See [migration behavior and future changes](migrations.md). Ingestion/training commands will be added with their
-tickets; they are not scheduled or run automatically at startup.
+See [migration behavior and future changes](migrations.md). Import validated CSVs explicitly:
+
+```sh
+docker compose --profile jobs run --rm --user "$(id -u):$(id -g)" job cmdl ingest
+```
+
+See [source preservation, replay and exclusion audit](ingestion.md). Training commands
+will arrive with their tickets. No batch command runs automatically at startup.
 
 ## Stop, persistence and reset
 
@@ -94,7 +100,8 @@ The smoke command builds and starts a uniquely named temporary project on tempor
 localhost ports. It runs the actual Streamlit script against the API, checks honest
 503 readiness, writes a probe row, verifies it survives DB restart and Compose
 recreation, then verifies `down --volumes` produces an empty database. It also checks
-initial/repeated migration, ledger persistence and reinstallation after reset. It always
+initial/repeated migration, real-source import/replay, ledger persistence and
+reinstallation after reset. It always
 cleans up only its own project and volume. It requires the dev environment installed
 with `uv sync --locked`. It does not touch the normal `cmdl` development volume.
 Docker builds require network access on the first run. If interrupted by a process

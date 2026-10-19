@@ -53,7 +53,31 @@ def main() -> None:
             compose("--profile", "jobs", "run", "--rm", "job", "cmdl", "migrate")
             == "Database is up to date."
         )
-        assert sql("SELECT count(*) FROM schema_migrations") == "1"
+        assert sql("SELECT count(*) FROM schema_migrations") == "2"
+        assert compose(
+            "--profile",
+            "jobs",
+            "run",
+            "--rm",
+            "job",
+            "cmdl",
+            "ingest",
+            "--output-dir",
+            "/tmp/cmdl-import-smoke",
+        ).startswith("Imported:")
+        assert compose(
+            "--profile",
+            "jobs",
+            "run",
+            "--rm",
+            "job",
+            "cmdl",
+            "ingest",
+            "--output-dir",
+            "/tmp/cmdl-import-smoke",
+        ).startswith("Already imported:")
+        assert sql("SELECT count(*) FROM source_rows") == "75434"
+        assert sql("SELECT count(*) FROM source_imports") == "1"
         with httpx.Client(timeout=10) as client:
             response = client.get(f"http://127.0.0.1:{env['API_PORT']}/health")
             response.raise_for_status()
@@ -90,7 +114,8 @@ def main() -> None:
         compose("down")
         up()
         assert sql("SELECT value FROM t05_probe") == "persisted"
-        assert sql("SELECT count(*) FROM schema_migrations") == "1"
+        assert sql("SELECT count(*) FROM schema_migrations") == "2"
+        assert sql("SELECT count(*) FROM source_imports") == "1"
         compose("down", "--volumes")
         up()
         assert sql("SELECT to_regclass('public.t05_probe') IS NULL") == "t"
@@ -98,7 +123,8 @@ def main() -> None:
         assert "0001_storage_v1.sql" in compose(
             "--profile", "jobs", "run", "--rm", "job", "cmdl", "migrate"
         )
-        print("PASS: UI → API → DB, honest readiness, restart/recreate persistence, volume reset")
+        assert sql("SELECT count(*) FROM source_imports") == "0"
+        print("PASS: UI → API → DB, migrations, import/replay, persistence and volume reset")
     except Exception:
         print(compose("logs", "--tail=100", "db", "api", "ui"))
         raise

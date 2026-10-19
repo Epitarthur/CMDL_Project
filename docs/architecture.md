@@ -14,7 +14,7 @@ and returns results. Streamlit displays reader and reviewer views.
 
 ## Layout
 
-- `src/cmdl/data/`: ingestion, validation, snapshots and availability.
+- `src/cmdl/data/`: verified profiling and transactional ingestion; snapshots are T08.
 - `src/cmdl/quality/`: checks, dimension scores, warnings and review decisions.
 - `src/cmdl/recommender/`: features, models, blending and fallbacks.
 - `src/cmdl/evaluation/`: temporal splits, metrics and controlled experiments.
@@ -39,4 +39,5 @@ with [API contracts and examples](contracts.md). T04’s artifacts were approved
 on 2026-10-19. T06 implements the schema with [versioned migrations](migrations.md)
 and transactional publication guards. Service implementation is T21.
 The T05 [development environment](compose.md) adds infrastructure and connectivity checks.
+T07 adds [idempotent source ingestion and an exclusion audit](ingestion.md).
 Product data services remain for their implementation tickets.

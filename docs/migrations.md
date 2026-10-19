@@ -1,10 +1,11 @@
 # PostgreSQL migrations (T06)
 
-`cmdl migrate` installs `cmdl-storage-v1`: 20 application tables, custom types,
+`cmdl migrate` installs `cmdl-storage-v1`: the initial 20 application tables, custom types,
 foreign keys, access indexes, publication checks and history guards. The separate
 `schema_migrations` table records filename, SHA-256 and applied UTC timestamp.
+T07 adds the append-only `source_imports` audit table through migration 0002.
 SQL lives in `src/cmdl/db/migrations/` and ships inside the application image/package.
-It contains no raw-data import, model training or automatic startup jobs.
+Migrations contain no raw-data import, model training or automatic startup jobs.
 
 ## Apply to the local development database
 
@@ -16,12 +17,13 @@ docker compose --profile jobs run --rm job cmdl migrate
 docker compose --profile jobs run --rm job cmdl migrate
 ```
 
-The first run reports `Applied: 0001_storage_v1.sql`. Subsequent runs report
+An empty database reports `Applied: 0001_storage_v1.sql, 0002_source_imports.sql`.
+An existing T06 database applies only `0002_source_imports.sql`. Subsequent runs report
 `Database is up to date.` Existing data is preserved. The job connects using the
 same `PG*` settings as the API, supplied from `.env` by Compose. It requires the
 database to be running; a connection failure exits nonzero without logging credentials.
 The normal API/UI remain at infrastructure-only status after migration: an empty
-schema has no published snapshot or recommendation artifacts. T07 imports the CSVs;
+schema has no published snapshot or recommendation artifacts. [T07 imports the CSVs](ingestion.md);
 T08 prepares snapshots. T18 implements review request/replay handling; T21 serving.
 
 For a PostgreSQL server outside Compose, install the locked environment and set libpq

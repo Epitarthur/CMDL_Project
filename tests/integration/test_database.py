@@ -22,23 +22,6 @@ B = "b" * 64
 CUTOFF = datetime(2017, 1, 1, tzinfo=UTC)
 
 
-@pytest.fixture
-def empty_db():
-    dsn = os.environ.get("CMDL_TEST_DSN")
-    if not dsn:
-        pytest.skip("Set CMDL_TEST_DSN for real PostgreSQL migration/constraint checks")
-    schema = "t06_" + uuid4().hex
-    with psycopg.connect(dsn, autocommit=True) as admin:
-        admin.execute(sql.SQL("CREATE SCHEMA {}").format(sql.Identifier(schema)))
-    with psycopg.connect(dsn, options=f"-c search_path={schema} -c timezone=UTC") as connection:
-        try:
-            yield connection
-        finally:
-            connection.rollback()
-    with psycopg.connect(dsn, autocommit=True) as admin:
-        admin.execute(sql.SQL("DROP SCHEMA {} CASCADE").format(sql.Identifier(schema)))
-
-
 def put(db, table, **values):
     fields = list(values)
     return db.execute(
@@ -259,28 +242,28 @@ def entry(db, s, rankings, content="10", rank=1, score=1, **overrides):
 
 
 def test_empty_migration_and_repeat_are_atomic(empty_db):
-    assert migration.migrate(empty_db) == ["0001_storage_v1.sql"]
+    assert migration.migrate(empty_db) == ["0001_storage_v1.sql", "0002_source_imports.sql"]
     assert migration.migrate(empty_db) == []
     assert (
         empty_db.execute(
             "SELECT count(*) FROM information_schema.tables WHERE table_schema=current_schema()"
         ).fetchone()[0]
-        == 21
+        == 22
     )
-    assert empty_db.execute("SELECT count(*) FROM schema_migrations").fetchone() == (1,)
+    assert empty_db.execute("SELECT count(*) FROM schema_migrations").fetchone() == (2,)
 
 
 def test_failed_migration_rolls_back_ddl_and_history(db, tmp_path, monkeypatch):
     folder = tmp_path / "migrations"
     folder.mkdir()
-    source = Path("src/cmdl/db/migrations/0001_storage_v1.sql").read_bytes()
-    (folder / "0001_storage_v1.sql").write_bytes(source)
-    (folder / "0002_broken.sql").write_text("CREATE TABLE rollback_probe(id int); SELECT 1/0;")
+    for source in Path("src/cmdl/db/migrations").glob("*.sql"):
+        (folder / source.name).write_bytes(source.read_bytes())
+    (folder / "0003_broken.sql").write_text("CREATE TABLE rollback_probe(id int); SELECT 1/0;")
     monkeypatch.setattr(migration, "files", lambda _: tmp_path)
     with pytest.raises(psycopg.errors.DivisionByZero):
         migration.migrate(db)
     assert db.execute("SELECT to_regclass('rollback_probe')").fetchone() == (None,)
-    assert db.execute("SELECT count(*) FROM schema_migrations").fetchone() == (1,)
+    assert db.execute("SELECT count(*) FROM schema_migrations").fetchone() == (2,)
 
 
 def test_checksum_mismatch_is_rejected(db):
@@ -307,7 +290,7 @@ def test_concurrent_migrators_are_serialized(empty_db):
 
     with ThreadPoolExecutor(max_workers=2) as pool:
         results = list(pool.map(lambda _: apply(), range(2)))
-    assert sorted(map(len, results)) == [0, 1]
+    assert sorted(map(len, results)) == [0, 2]
 
 
 def test_ids_utc_duplicates_and_original_strings_survive(seeded):

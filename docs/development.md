@@ -128,3 +128,50 @@ into the development database and product readiness still returns 503.
 CI now supplies a PostgreSQL service and `CMDL_TEST_DSN` so database tests run rather
 than skip. Without that variable, local runs skip those 49 tests. See
 [migration commands and implementation details](migrations.md).
+
+
+## T07 ingestion validation — 2026-10-19
+
+134 tests pass, including 49 storage checks and 19 ingestion/report checks. The new
+checks cover malformed source rejection before writes, exact strings and multiline
+metadata, retained duplicates and repeated events, full-transaction rollback,
+concurrent replay, provenance conflicts, removal-only/unresolved identity stubs,
+replay after publication and shared-file reuse, overlap accounting, and export
+failure recovery without duplicate database records. The profiler now hashes and
+parses the same in-memory bytes and rejects NUL characters; its existing source
+profiles remain unchanged.
+
+The full original dataset imports and replays in PostgreSQL and in the packaged
+Docker command. Docker also verifies import-ledger persistence across recreation
+and complete reset in a disposable volume. The normal development database was
+upgraded from migration 0001 to 0002, imported once, and replayed with no added rows.
+Migration 0001 and raw CSV/manifest bytes remain unchanged.
+
+Import ID: `8a46c7b5-ce33-590f-acf7-e2d4a9198313`.
+Local exports: `artifacts/source-import/import.json` and `import.md` (ignored by Git).
+The database retains the same report in append-only `source_imports`.
+
+| Stored output / partition | Count |
+| --- | ---: |
+| Source rows | 75,434 |
+| Article events | 3,122 |
+| Original share metadata versions | 3,047 |
+| Interactions | 72,312 |
+| Exact duplicate interaction copies | 11 |
+| Canonical unresolved | 0 |
+| Canonical removal-only | 43 |
+| Canonical pre-share | 95 |
+| Canonical ambiguous / equal-time | 12 |
+| Canonical removed | 16 |
+| Canonical eligible before cutoff/history filtering | 72,135 |
+
+The seven interaction partition categories sum to 72,312. There are 177 audit rows
+(11 duplicates plus 166 temporal exclusions; no overlap in these original files).
+Separate synthetic tests verify overlap is counted only once in the partition.
+There are 1,895 interacting users and 252 authors, with 1,896 identities in their
+union; the extra author-only identity must not inflate the evaluation user count.
+There are 3,057 article identities, including 10 removal-only and no interaction-only
+identities in this source version. Stub behavior is covered by synthetic fixtures.
+
+No snapshot has been published and product readiness remains 503. Snapshot/fitting
+cutoffs, consumed-item filtering and model preparation remain later tickets.

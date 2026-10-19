@@ -92,3 +92,17 @@ and publication boundaries enforceable. The concrete manifest/coverage/branch JS
 formats are recorded in `migrations.md`; these additive implementation details do
 not change benchmark v1 or API payloads. T07 ingestion, T08 snapshot preparation,
 T18 replay response handling and T21 product serving remain their own tickets.
+
+
+## T07 source ingestion (2026-10-19)
+
+Keep every validated raw event and string unchanged. Exact full-row copies retain
+canonical pointers, and metadata originates only from shares. Import both files and
+a durable exclusion audit in one transaction; serialize imports and use a stable
+version/protocol/file-hash identity for replays. New migration 0002 supplies the
+append-only audit ledger; applied SQL is unchanged. Local JSON/Markdown exports can
+be regenerated from the committed audit after filesystem failure.
+
+The source audit partitions interactions before snapshot/cutoff/history filters;
+it does not publish an evaluation population. Benchmark v1 and API semantics are
+unchanged. See `ingestion.md` and the current evidence in `development.md`.

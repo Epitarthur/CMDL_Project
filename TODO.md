@@ -1,6 +1,6 @@
 # Project TODO and implementation tickets
 
-Status: T01–T03 completed on 2026-10-19 following Florian’s explicit approval and closure instruction. Benchmark v1 is frozen, publisher version/license and current slide counts are verified, and tooling/CI pass. T04’s schema and API contract are approved and complete; T05’s Docker environment is implemented and locally verified; T06 migrations and database guards are implemented and verified; T07 onward remain planned.
+Status: T01–T03 completed on 2026-10-19 following Florian’s explicit approval and closure instruction. Benchmark v1 is frozen, publisher version/license and current slide counts are verified, and tooling/CI pass. T04’s schema and API contract are approved and complete; T05’s Docker environment is implemented and locally verified; T06 migrations and database guards are implemented and verified; T07 ingestion and its exclusion audit are implemented and verified; T08 onward remain planned.
 
 Tickets are local planning records, not GitHub Issues. Owners are defaults. Dependencies use ticket numbers; work within a phase may proceed in parallel when dependencies permit. Update status and link implementation commits/PRs and evidence as work completes.
 
@@ -93,7 +93,7 @@ Migration applied to the local development database; no raw ingestion performed.
 See [migration guide](docs/migrations.md) and [validation](docs/development.md).
 
 
-### [ ] T07 — Build idempotent CSV ingestion
+### [x] T07 — Build idempotent CSV ingestion
 
 **Owner:** Florian  
 **Depends on:** T01, T02, T06
@@ -101,6 +101,15 @@ See [migration guide](docs/migrations.md) and [validation](docs/development.md).
 **Implement / produce:** Validate and import raw rows; separate metadata from article events; identify source rows with file checksum and row number; apply documented source duplicate handling; publish exclusion report.
 
 **Validate / acceptance:** Import twice without doubling records; test malformed rows, repeated rows, removal-only IDs and pre-share interactions; reconcile retained and excluded totals.
+
+**Evidence (2026-10-19):** Transactional importer, append-only import ledger and
+replayable exclusion report implemented. Both source files imported into the local
+development database and replayed without additional records. All 75,434 source rows
+are retained; 72,312 interactions partition into 11 exact copies, 166 temporal
+exclusions and 72,135 canonical eligible rows before cutoff/history filters.
+134 tests pass; Docker verifies packaged import/replay, persistence and reset.
+See [ingestion guide](docs/ingestion.md) and [validation](docs/development.md).
+
 
 ### [ ] T08 — Publish snapshots and temporal eligibility
 
