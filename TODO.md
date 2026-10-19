@@ -1,6 +1,6 @@
 # Project TODO and implementation tickets
 
-Status: T01–T03 completed on 2026-10-19 following Florian’s explicit approval and closure instruction. Benchmark v1 is frozen, publisher version/license and current slide counts are verified, and tooling/CI pass. T04 is specified and validated, pending human review; T05 onward remain planned.
+Status: T01–T03 completed on 2026-10-19 following Florian’s explicit approval and closure instruction. Benchmark v1 is frozen, publisher version/license and current slide counts are verified, and tooling/CI pass. T04’s schema and API contract are approved and complete; T05 onward remain planned.
 
 Tickets are local planning records, not GitHub Issues. Owners are defaults. Dependencies use ticket numbers; work within a phase may proceed in parallel when dependencies permit. Update status and link implementation commits/PRs and evidence as work completes.
 
@@ -48,9 +48,9 @@ Tickets are local planning records, not GitHub Issues. Owners are defaults. Depe
 
 **Validate / acceptance:** Fresh environment installs the package; lint and meaningful tests run in CI; generated outputs and local secrets remain ignored.
 
-### [ ] T04 — Freeze schema and service payloads
+### [x] T04 — Freeze schema and service payloads
 
-**Schema approved; API review pending (2026-10-19):** Florian approved `cmdl-storage-v1`. `docs/database-schema.md` specifies `cmdl-storage-v1` entities, keys, publication rules and indexes. `docs/contracts.md` and `docs/api/openapi.json` specify `cmdl-api-v1`: seven routes, quality score semantics, version matching, deterministic fallback, review idempotency and errors. `docs/api/examples.json` contains 23 illustrative examples with lineage. OpenAPI, payload and cross-field fixture checks pass. Review of the API payload examples is still required; the schema approval does not imply API approval or additional contributor signatures. No migrations or services have been implemented by T04.
+**Completed (2026-10-19):** Florian approved both `cmdl-storage-v1` and `cmdl-api-v1`, including representative payloads. The database specification, seven API routes, quality score semantics, fallback behavior, version matching, review idempotency and errors are documented in `docs/database-schema.md`, `docs/contracts.md` and `docs/api/openapi.json`. All 23 examples and cross-field checks pass; 64 tests and [hosted CI](https://github.com/Epitarthur/CMDL_Project/actions/runs/39216881264) passed for implementation commit `7f47bdc`. Future changes are allowed with versioned contract/example updates. No additional contributor signatures or running services/migrations are claimed.
 
 **Owner:** Florian + Arthur + Charly + Youssef  
 **Depends on:** T01, T02

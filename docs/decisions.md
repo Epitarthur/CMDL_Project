@@ -19,9 +19,8 @@ Agreed with Florian during repository planning:
 
 ## Decisions still open
 
-- Human review/freeze of the T04 schema/API contract package.
 - Quality rule thresholds/applicability and how quality changes hybrid weights;
-  T04 proposes dimension/aggregation semantics.
+  T04 fixes the approved dimension/aggregation semantics.
 - Multilingual embedding model, chunking and normalization. T04 specifies eligible
   popularity as serving fallback; semantic models remain later extensions.
 - Corruption details, manual-sample selection and calibration/validation allocation.
@@ -71,3 +70,11 @@ Florian's T01 approval does not imply approval of this new T04 package. See
 Florian reviewed and approved `cmdl-storage-v1` ("schema looks good"). The database
 schema is frozen for implementation. API contract/payload review remains pending;
 T04 stays open until that remaining review is recorded.
+
+## T04 API approval and closure (2026-10-19)
+
+Florian approved `cmdl-api-v1` and its representative payloads ("contract also looks
+good, we will update it later if needed"). With the earlier storage approval, T04
+is complete. Later contract changes are permitted with versioned specifications,
+examples and affected-consumer updates, followed by validation. No separate
+contributor approvals are inferred. T05 can use these approved contracts.

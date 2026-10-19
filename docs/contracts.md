@@ -2,8 +2,9 @@
 
 Contract ID: `cmdl-api-v1`; storage: [`cmdl-storage-v1`](database-schema.md);
 benchmark: [`deskdrop-temporal-v1`](benchmark-proposal.md). T04 specifies the interfaces;
-services, migrations, models and screens remain later tickets. Version 1 is ready for
-review; separate approvals from Arthur, Charly and Youssef are not recorded.
+services, migrations, models and screens remain later tickets. Florian approved
+the API contract and example payloads on 2026-10-19, following schema approval.
+Separate approvals from Arthur, Charly and Youssef are not recorded.
 
 The machine-readable source is [OpenAPI 3.1](api/openapi.json). All examples in
 [examples.json](api/examples.json) are **illustrative fixtures**, not trained model
@@ -154,5 +155,14 @@ clear stale success data, display the error, and allow retry when appropriate.
 Representative examples cover normal ranking, cold start, short/empty output,
 similarity, unavailable quality, a populated report, article lookup, review/replay,
 version conflicts, invalid input and dependency failure. They can drive a UI adapter
-before live services exist. T04 is ready for human review of these artifacts;
-independent contributor approval is not inferred from passing contract tests.
+before live services exist. Florian approved these artifacts on 2026-10-19 and
+authorized later revisions as needed; T04 is complete.
+
+## Later changes
+
+The approved v1 contract is the implementation baseline, not a permanent restriction.
+Record behavioral/schema changes with their reason, date and contract version;
+update OpenAPI, example payloads, storage specifications and affected consumers
+together, then rerun contract checks. Preserve the previous version in Git history.
+Wording-only corrections can retain the version when behavior is unchanged. A change
+to benchmark semantics must also follow the separate benchmark versioning policy.

@@ -8,7 +8,7 @@ Python package, locked development tooling, CI workflow and a tested source-data
 profiler are implemented. Application services, models, database migrations and
 Docker services remain planned. T01–T03 are complete: benchmark v1 is approved,
 dataset version/license and presentation counts are verified, and CI has passed.
-T04’s database/API contract package is specified and ready for human review.
+T04’s database schema and API contract are approved. T01–T04 are complete.
 
 ## Planned stack
 
