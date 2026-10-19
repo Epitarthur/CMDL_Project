@@ -19,9 +19,11 @@ Agreed with Florian during repository planning:
 
 ## Decisions still open
 
-- Exact schema, API payloads and review-decision route.
-- Quality dimensions, thresholds, aggregation and how quality changes hybrid weights.
-- Multilingual embedding model, chunking, normalization and fallback order.
+- Human review/freeze of the T04 schema/API contract package.
+- Quality rule thresholds/applicability and how quality changes hybrid weights;
+  T04 proposes dimension/aggregation semantics.
+- Multilingual embedding model, chunking and normalization. T04 specifies eligible
+  popularity as serving fallback; semantic models remain later extensions.
 - Corruption details, manual-sample selection and calibration/validation allocation.
 - Experiment tracking and latency measurement setup.
 - Calendar milestones and final course submission requirements.
@@ -51,3 +53,15 @@ Publisher version 5 is verified against both original CSV hashes. The publisher
 declares ODbL 1.0 for the database and DbCL 1.0 for its contents; attribution and
 redistribution references are in `dataset-provenance.md`. Temporal/join anomalies
 affect 166 distinct interaction rows; overlapping groups must not be summed.
+
+## T04 contract package ready for review (2026-10-19)
+
+`cmdl-storage-v1` and `cmdl-api-v1` specify tables/constraints, seven API routes and
+23 illustrative examples. Decisions include explicit historical snapshot context,
+version-matched quality, eligible popularity fallback, append-only reviews with
+idempotent replay, and null scores for unavailable quality. Four equal-weight quality
+dimensions expose assessed/unassessed coverage; exact checks remain T16.
+
+These are concrete defaults for review, not independent contributor approvals.
+Florian's T01 approval does not imply approval of this new T04 package. See
+`contracts.md`, `database-schema.md` and `api/examples.json`.

@@ -1,0 +1,2812 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "CMDL API contract",
+    "version": "1.0.0",
+    "description": "cmdl-api-v1. Design contract only; no service is implemented by T04. All examples are illustrative fixtures."
+  },
+  "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
+  "paths": {
+    "/ready": {
+      "get": {
+        "operationId": "readiness",
+        "responses": {
+          "200": {
+            "description": "Ready",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ready"
+                },
+                "examples": {
+                  "ready": {
+                    "summary": "Illustrative contract fixture",
+                    "value": {
+                      "contract_version": "cmdl-api-v1",
+                      "request_id": "00000000-0000-4000-8000-000000000001",
+                      "status": "ready",
+                      "active_snapshot_id": "00000000-0000-4000-8000-000000000010",
+                      "as_of_at": "2017-02-01T00:00:00Z",
+                      "request_time": "2026-10-19T09:00:00Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Required dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "readiness_failure": {
+                    "summary": "Illustrative contract fixture",
+                    "value": {
+                      "request_id": "00000000-0000-4000-8000-000000000001",
+                      "code": "DependencyUnavailable",
+                      "message": "Required database is unavailable.",
+                      "retryable": true,
+                      "issues": []
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Suggested retry delay in seconds when known",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/recommend/{person_id}": {
+      "get": {
+        "operationId": "recommend",
+        "parameters": [
+          {
+            "name": "person_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/SourceId"
+            }
+          },
+          {
+            "name": "snapshot_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10,
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationResponse"
+                },
+                "examples": {
+                  "personalized": {
+                    "summary": "Illustrative contract fixture",
+                    "value": {
+                      "person_id": "-8845298781299428018",
+                      "context": {
+                        "contract_version": "cmdl-api-v1",
+                        "request_id": "00000000-0000-4000-8000-000000000001",
+                        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                        "protocol_id": "deskdrop-temporal-v1",
+                        "as_of_at": "2017-02-01T00:00:00Z",
+                        "request_time": "2026-10-19T09:00:00Z"
+                      },
+                      "ranking_set_id": "00000000-0000-4000-8000-000000000080",
+                      "primary_model_run_id": "00000000-0000-4000-8000-000000000050",
+                      "fallback_model_run_id": "00000000-0000-4000-8000-000000000051",
+                      "limit": 2,
+                      "returned_count": 2,
+                      "short_result": false,
+                      "fallback_reasons": [],
+                      "items": [
+                        {
+                          "rank": 1,
+                          "article": {
+                            "content_id": "9223372036854775807",
+                            "availability": "available",
+                            "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+                            "metadata": {
+                              "variant_id": "original",
+                              "share_event_at": "2017-01-10T10:00:00Z",
+                              "title": "Illustrative article about data systems",
+                              "text": "Synthetic text for reviewing the contract.",
+                              "url": "https://example.org/articles/data",
+                              "lang": "en",
+                              "content_type": "HTML"
+                            }
+                          },
+                          "source": "primary",
+                          "model_run_id": "00000000-0000-4000-8000-000000000050",
+                          "feature_set_id": "00000000-0000-4000-8000-000000000060",
+                          "explanation": {
+                            "code": "hybrid",
+                            "text": "Illustrative blend of content and historical interaction signals."
+                          },
+                          "quality": {
+                            "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                            "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+                            "status": "available",
+                            "quality_run_id": "00000000-0000-4000-8000-000000000030",
+                            "checks_version": "illustrative-checks-v1",
+                            "dimensions": {
+                              "completeness": {
+                                "score": 1.0,
+                                "assessed_checks": 4,
+                                "passed_checks": 4,
+                                "unassessed_checks": 0
+                              },
+                              "validity": {
+                                "score": 1.0,
+                                "assessed_checks": 2,
+                                "passed_checks": 2,
+                                "unassessed_checks": 0
+                              },
+                              "consistency": {
+                                "score": 0.5,
+                                "assessed_checks": 2,
+                                "passed_checks": 1,
+                                "unassessed_checks": 0
+                              },
+                              "informativeness": {
+                                "score": 0.5,
+                                "assessed_checks": 2,
+                                "passed_checks": 1,
+                                "unassessed_checks": 0
+                              }
+                            },
+                            "overall_score": 0.75,
+                            "warnings": [
+                              {
+                                "warning_id": "00000000-0000-4000-8000-000000000040",
+                                "check_id": "language_consistency",
+                                "field": "lang",
+                                "dimension": "consistency",
+                                "severity": "warning",
+                                "reason": "Illustrative mismatch signal; actual language rules are T16.",
+                                "reviews": []
+                              },
+                              {
+                                "warning_id": "00000000-0000-4000-8000-000000000041",
+                                "check_id": "text_informativeness",
+                                "field": "text",
+                                "dimension": "informativeness",
+                                "severity": "warning",
+                                "reason": "Illustrative short-text signal; not a measured finding.",
+                                "reviews": []
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "rank": 2,
+                          "article": {
+                            "content_id": "-6451309518266745024",
+                            "availability": "available",
+                            "metadata_version_id": "00000000-0000-4000-8000-000000000021",
+                            "metadata": {
+                              "variant_id": "original",
+                              "share_event_at": "2017-01-10T10:00:00Z",
+                              "title": "Second illustrative article",
+                              "text": "Synthetic text for reviewing the contract.",
+                              "url": "https://example.org/articles/data",
+                              "lang": "en",
+                              "content_type": "HTML"
+                            }
+                          },
+                          "source": "primary",
+                          "model_run_id": "00000000-0000-4000-8000-000000000050",
+                          "feature_set_id": "00000000-0000-4000-8000-000000000060",
+                          "explanation": {
+                            "code": "hybrid",
+                            "text": "Illustrative blend of content and historical interaction signals."
+                          },
+                          "quality": {
+                            "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                            "metadata_version_id": "00000000-0000-4000-8000-000000000021",
+                            "status": "unavailable",
+                            "reason": "not_run",
+                            "quality_run_id": null,
+                            "checks_version": null,
+                            "dimensions": null,
+                            "overall_score": null,
+                            "warnings": []
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "cold_start_short": {
+                    "summary": "Illustrative contract fixture",
+                    "value": {
+                      "person_id": "999999999999999999",
+                      "context": {
+                        "contract_version": "cmdl-api-v1",
+                        "request_id": "00000000-0000-4000-8000-000000000001",
+                        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                        "protocol_id": "deskdrop-temporal-v1",
+                        "as_of_at": "2017-02-01T00:00:00Z",
+                        "request_time": "2026-10-19T09:00:00Z"
+                      },
+                      "ranking_set_id": null,
+                      "primary_model_run_id": null,
+                      "fallback_model_run_id": "00000000-0000-4000-8000-000000000051",
+                      "limit": 10,
+                      "returned_count": 1,
+                      "short_result": true,
+                      "fallback_reasons": [
+                        "unknown_user"
+                      ],
+                      "items": [
+                        {
+                          "rank": 1,
+                          "article": {
+                            "content_id": "-6451309518266745024",
+                            "availability": "available",
+                            "metadata_version_id": "00000000-0000-4000-8000-000000000021",
+                            "metadata": {
+                              "variant_id": "original",
+                              "share_event_at": "2017-01-10T10:00:00Z",
+                              "title": "Illustrative article about data systems",
+                              "text": "Synthetic text for reviewing the contract.",
+                              "url": "https://example.org/articles/data",
+                              "lang": "en",
+                              "content_type": "HTML"
+                            }
+                          },
+                          "source": "popularity",
+                          "model_run_id": "00000000-0000-4000-8000-000000000051",
+                          "feature_set_id": null,
+                          "explanation": {
+                            "code": "popular",
+                            "text": "Popular among eligible historical interactions."
+                          },
+                          "quality": {
+                            "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                            "metadata_version_id": "00000000-0000-4000-8000-000000000021",
+                            "status": "unavailable",
+                            "reason": "not_run",
+                            "quality_run_id": null,
+                            "checks_version": null,
+                            "dimensions": null,
+                            "overall_score": null,
+                            "warnings": []
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "mixed_primary_and_fallback": {
+                    "summary": "Illustrative contract fixture",
+                    "value": {
+                      "person_id": "-8845298781299428018",
+                      "context": {
+                        "contract_version": "cmdl-api-v1",
+                        "request_id": "00000000-0000-4000-8000-000000000001",
+                        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                        "protocol_id": "deskdrop-temporal-v1",
+                        "as_of_at": "2017-02-01T00:00:00Z",
+                        "request_time": "2026-10-19T09:00:00Z"
+                      },
+                      "ranking_set_id": "00000000-0000-4000-8000-000000000080",
+                      "primary_model_run_id": "00000000-0000-4000-8000-000000000050",
+                      "fallback_model_run_id": "00000000-0000-4000-8000-000000000051",
+                      "limit": 10,
+                      "returned_count": 2,
+                      "short_result": true,
+                      "fallback_reasons": [
+                        "prepared_candidates_exhausted"
+                      ],
+                      "items": [
+                        {
+                          "rank": 1,
+                          "article": {
+                            "content_id": "9223372036854775807",
+                            "availability": "available",
+                            "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+                            "metadata": {
+                              "variant_id": "original",
+                              "share_event_at": "2017-01-10T10:00:00Z",
+                              "title": "Illustrative article about data systems",
+                              "text": "Synthetic text for reviewing the contract.",
+                              "url": "https://example.org/articles/data",
+                              "lang": "en",
+                              "content_type": "HTML"
+                            }
+                          },
+                          "source": "primary",
+                          "model_run_id": "00000000-0000-4000-8000-000000000050",
+                          "feature_set_id": "00000000-0000-4000-8000-000000000060",
+                          "explanation": {
+                            "code": "hybrid",
+                            "text": "Illustrative blend of content and historical interaction signals."
+                          },
+                          "quality": {
+                            "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                            "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+                            "status": "available",
+                            "quality_run_id": "00000000-0000-4000-8000-000000000030",
+                            "checks_version": "illustrative-checks-v1",
+                            "dimensions": {
+                              "completeness": {
+                                "score": 1.0,
+                                "assessed_checks": 4,
+                                "passed_checks": 4,
+                                "unassessed_checks": 0
+                              },
+                              "validity": {
+                                "score": 1.0,
+                                "assessed_checks": 2,
+                                "passed_checks": 2,
+                                "unassessed_checks": 0
+                              },
+                              "consistency": {
+                                "score": 0.5,
+                                "assessed_checks": 2,
+                                "passed_checks": 1,
+                                "unassessed_checks": 0
+                              },
+                              "informativeness": {
+                                "score": 0.5,
+                                "assessed_checks": 2,
+                                "passed_checks": 1,
+                                "unassessed_checks": 0
+                              }
+                            },
+                            "overall_score": 0.75,
+                            "warnings": [
+                              {
+                                "warning_id": "00000000-0000-4000-8000-000000000040",
+                                "check_id": "language_consistency",
+                                "field": "lang",
+                                "dimension": "consistency",
+                                "severity": "warning",
+                                "reason": "Illustrative mismatch signal; actual language rules are T16.",
+                                "reviews": []
+                              },
+                              {
+                                "warning_id": "00000000-0000-4000-8000-000000000041",
+                                "check_id": "text_informativeness",
+                                "field": "text",
+                                "dimension": "informativeness",
+                                "severity": "warning",
+                                "reason": "Illustrative short-text signal; not a measured finding.",
+                                "reviews": []
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "rank": 2,
+                          "article": {
+                            "content_id": "-6451309518266745024",
+                            "availability": "available",
+                            "metadata_version_id": "00000000-0000-4000-8000-000000000021",
+                            "metadata": {
+                              "variant_id": "original",
+                              "share_event_at": "2017-01-10T10:00:00Z",
+                              "title": "Illustrative article about data systems",
+                              "text": "Synthetic text for reviewing the contract.",
+                              "url": "https://example.org/articles/data",
+                              "lang": "en",
+                              "content_type": "HTML"
+                            }
+                          },
+                          "source": "popularity",
+                          "model_run_id": "00000000-0000-4000-8000-000000000051",
+                          "feature_set_id": null,
+                          "explanation": {
+                            "code": "popular",
+                            "text": "Popular among eligible historical interactions."
+                          },
+                          "quality": {
+                            "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                            "metadata_version_id": "00000000-0000-4000-8000-000000000021",
+                            "status": "unavailable",
+                            "reason": "not_run",
+                            "quality_run_id": null,
+                            "checks_version": null,
+                            "dimensions": null,
+                            "overall_score": null,
+                            "warnings": []
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "empty_catalog": {
+                    "summary": "Illustrative contract fixture",
+                    "value": {
+                      "person_id": "-8845298781299428018",
+                      "context": {
+                        "contract_version": "cmdl-api-v1",
+                        "request_id": "00000000-0000-4000-8000-000000000001",
+                        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                        "protocol_id": "deskdrop-temporal-v1",
+                        "as_of_at": "2017-02-01T00:00:00Z",
+                        "request_time": "2026-10-19T09:00:00Z"
+                      },
+                      "ranking_set_id": "00000000-0000-4000-8000-000000000080",
+                      "primary_model_run_id": "00000000-0000-4000-8000-000000000050",
+                      "fallback_model_run_id": "00000000-0000-4000-8000-000000000051",
+                      "limit": 1,
+                      "returned_count": 0,
+                      "short_result": true,
+                      "fallback_reasons": [
+                        "prepared_candidates_exhausted",
+                        "no_eligible_candidates"
+                      ],
+                      "items": []
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown snapshot; unknown well-formed users return fallback instead",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Selected snapshot not published",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_limit": {
+                    "summary": "Illustrative contract fixture",
+                    "value": {
+                      "request_id": "00000000-0000-4000-8000-000000000001",
+                      "code": "InvalidInput",
+                      "message": "limit must be between 1 and 10.",
+                      "retryable": false,
+                      "issues": [
+                        {
+                          "field": "query.limit",
+                          "message": "Expected integer in [1, 10]."
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "dependency_failure": {
+                    "summary": "Illustrative contract fixture",
+                    "value": {
+                      "request_id": "00000000-0000-4000-8000-000000000001",
+                      "code": "DependencyUnavailable",
+                      "message": "Required snapshot or ranking artifacts are unavailable.",
+                      "retryable": true,
+                      "issues": []
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Suggested retry delay in seconds when known",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        },
+        "description": "Ordered up-to-limit results at the published snapshot boundary. No scores or client reranking. Empty eligible catalog is 200; missing required artifacts is 503."
+      }
+    },
+    "/similar/{content_id}": {
+      "get": {
+        "operationId": "similar",
+        "parameters": [
+          {
+            "name": "content_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/SourceId"
+            }
+          },
+          {
+            "name": "snapshot_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10,
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimilarResponse"
+                },
+                "examples": {
+                  "similar": {
+                    "summary": "Illustrative contract fixture",
+                    "value": {
+                      "content_id": "-3499919498720038879",
+                      "context": {
+                        "contract_version": "cmdl-api-v1",
+                        "request_id": "00000000-0000-4000-8000-000000000001",
+                        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                        "protocol_id": "deskdrop-temporal-v1",
+                        "as_of_at": "2017-02-01T00:00:00Z",
+                        "request_time": "2026-10-19T09:00:00Z"
+                      },
+                      "ranking_set_id": "00000000-0000-4000-8000-000000000081",
+                      "primary_model_run_id": "00000000-0000-4000-8000-000000000050",
+                      "fallback_model_run_id": "00000000-0000-4000-8000-000000000051",
+                      "limit": 1,
+                      "returned_count": 1,
+                      "short_result": false,
+                      "fallback_reasons": [],
+                      "items": [
+                        {
+                          "rank": 1,
+                          "article": {
+                            "content_id": "9223372036854775807",
+                            "availability": "available",
+                            "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+                            "metadata": {
+                              "variant_id": "original",
+                              "share_event_at": "2017-01-10T10:00:00Z",
+                              "title": "Illustrative article about data systems",
+                              "text": "Synthetic text for reviewing the contract.",
+                              "url": "https://example.org/articles/data",
+                              "lang": "en",
+                              "content_type": "HTML"
+                            }
+                          },
+                          "source": "primary",
+                          "model_run_id": "00000000-0000-4000-8000-000000000050",
+                          "feature_set_id": "00000000-0000-4000-8000-000000000060",
+                          "explanation": {
+                            "code": "content",
+                            "text": "Content similarity from the selected feature version."
+                          },
+                          "quality": {
+                            "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                            "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+                            "status": "available",
+                            "quality_run_id": "00000000-0000-4000-8000-000000000030",
+                            "checks_version": "illustrative-checks-v1",
+                            "dimensions": {
+                              "completeness": {
+                                "score": 1.0,
+                                "assessed_checks": 4,
+                                "passed_checks": 4,
+                                "unassessed_checks": 0
+                              },
+                              "validity": {
+                                "score": 1.0,
+                                "assessed_checks": 2,
+                                "passed_checks": 2,
+                                "unassessed_checks": 0
+                              },
+                              "consistency": {
+                                "score": 0.5,
+                                "assessed_checks": 2,
+                                "passed_checks": 1,
+                                "unassessed_checks": 0
+                              },
+                              "informativeness": {
+                                "score": 0.5,
+                                "assessed_checks": 2,
+                                "passed_checks": 1,
+                                "unassessed_checks": 0
+                              }
+                            },
+                            "overall_score": 0.75,
+                            "warnings": [
+                              {
+                                "warning_id": "00000000-0000-4000-8000-000000000040",
+                                "check_id": "language_consistency",
+                                "field": "lang",
+                                "dimension": "consistency",
+                                "severity": "warning",
+                                "reason": "Illustrative mismatch signal; actual language rules are T16.",
+                                "reviews": []
+                              },
+                              {
+                                "warning_id": "00000000-0000-4000-8000-000000000041",
+                                "check_id": "text_informativeness",
+                                "field": "text",
+                                "dimension": "informativeness",
+                                "severity": "warning",
+                                "reason": "Illustrative short-text signal; not a measured finding.",
+                                "reviews": []
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown identity or snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, publication or idempotency conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Suggested retry delay in seconds when known",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        },
+        "description": "Ordered up-to-limit results at the published snapshot boundary. No scores or client reranking. Empty eligible catalog is 200; missing required artifacts is 503."
+      }
+    },
+    "/articles/{content_id}": {
+      "get": {
+        "operationId": "article",
+        "parameters": [
+          {
+            "name": "content_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/SourceId"
+            }
+          },
+          {
+            "name": "snapshot_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleResponse"
+                },
+                "examples": {
+                  "article": {
+                    "summary": "Illustrative contract fixture",
+                    "value": {
+                      "context": {
+                        "contract_version": "cmdl-api-v1",
+                        "request_id": "00000000-0000-4000-8000-000000000001",
+                        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                        "protocol_id": "deskdrop-temporal-v1",
+                        "as_of_at": "2017-02-01T00:00:00Z",
+                        "request_time": "2026-10-19T09:00:00Z"
+                      },
+                      "article": {
+                        "content_id": "9223372036854775807",
+                        "availability": "available",
+                        "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+                        "metadata": {
+                          "variant_id": "original",
+                          "share_event_at": "2017-01-10T10:00:00Z",
+                          "title": "Illustrative article about data systems",
+                          "text": "Synthetic text for reviewing the contract.",
+                          "url": "https://example.org/articles/data",
+                          "lang": "en",
+                          "content_type": "HTML"
+                        }
+                      }
+                    }
+                  },
+                  "removed_article": {
+                    "summary": "Illustrative contract fixture",
+                    "value": {
+                      "context": {
+                        "contract_version": "cmdl-api-v1",
+                        "request_id": "00000000-0000-4000-8000-000000000001",
+                        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                        "protocol_id": "deskdrop-temporal-v1",
+                        "as_of_at": "2017-02-01T00:00:00Z",
+                        "request_time": "2026-10-19T09:00:00Z"
+                      },
+                      "article": {
+                        "content_id": "9223372036854775807",
+                        "availability": "removed",
+                        "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+                        "metadata": {
+                          "variant_id": "original",
+                          "share_event_at": "2017-01-10T10:00:00Z",
+                          "title": "Illustrative article about data systems",
+                          "text": "Synthetic text for reviewing the contract.",
+                          "url": "https://example.org/articles/data",
+                          "lang": "en",
+                          "content_type": "HTML"
+                        }
+                      }
+                    }
+                  },
+                  "no_future_metadata": {
+                    "summary": "Illustrative contract fixture",
+                    "value": {
+                      "context": {
+                        "contract_version": "cmdl-api-v1",
+                        "request_id": "00000000-0000-4000-8000-000000000001",
+                        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                        "protocol_id": "deskdrop-temporal-v1",
+                        "as_of_at": "2017-02-01T00:00:00Z",
+                        "request_time": "2026-10-19T09:00:00Z"
+                      },
+                      "article": {
+                        "content_id": "100",
+                        "availability": "not_shared",
+                        "metadata_version_id": null,
+                        "metadata": null
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown identity or snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "unknown_article": {
+                    "summary": "Illustrative contract fixture",
+                    "value": {
+                      "request_id": "00000000-0000-4000-8000-000000000001",
+                      "code": "UnknownArticle",
+                      "message": "Article identity was not found.",
+                      "retryable": false,
+                      "issues": []
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, publication or idempotency conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Suggested retry delay in seconds when known",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quality/report": {
+      "get": {
+        "operationId": "quality_report",
+        "parameters": [
+          {
+            "name": "snapshot_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QualityReportResponse"
+                },
+                "examples": {
+                  "quality_report_partial_coverage": {
+                    "summary": "Illustrative contract fixture",
+                    "value": {
+                      "context": {
+                        "contract_version": "cmdl-api-v1",
+                        "request_id": "00000000-0000-4000-8000-000000000001",
+                        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                        "protocol_id": "deskdrop-temporal-v1",
+                        "as_of_at": "2017-02-01T00:00:00Z",
+                        "request_time": "2026-10-19T09:00:00Z"
+                      },
+                      "status": "available",
+                      "quality_run_id": "00000000-0000-4000-8000-000000000030",
+                      "checks_version": "illustrative-checks-v1",
+                      "reason": null,
+                      "catalog_records": 3,
+                      "assessed_records": 1,
+                      "unassessed_records": 2,
+                      "dimension_means": {
+                        "completeness": 1.0,
+                        "validity": 1.0,
+                        "consistency": 0.5,
+                        "informativeness": 0.5
+                      },
+                      "dimension_denominators": {
+                        "completeness": 1,
+                        "validity": 1,
+                        "consistency": 1,
+                        "informativeness": 1
+                      },
+                      "warning_count": 2,
+                      "review_decision_counts": {
+                        "confirm": 1,
+                        "reject": 0
+                      }
+                    }
+                  },
+                  "quality_report_no_run": {
+                    "summary": "Illustrative contract fixture",
+                    "value": {
+                      "context": {
+                        "contract_version": "cmdl-api-v1",
+                        "request_id": "00000000-0000-4000-8000-000000000001",
+                        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                        "protocol_id": "deskdrop-temporal-v1",
+                        "as_of_at": "2017-02-01T00:00:00Z",
+                        "request_time": "2026-10-19T09:00:00Z"
+                      },
+                      "status": "unavailable",
+                      "quality_run_id": null,
+                      "checks_version": null,
+                      "reason": "not_run",
+                      "catalog_records": 3,
+                      "assessed_records": 0,
+                      "unassessed_records": 3,
+                      "dimension_means": {
+                        "completeness": null,
+                        "validity": null,
+                        "consistency": null,
+                        "informativeness": null
+                      },
+                      "dimension_denominators": {
+                        "completeness": 0,
+                        "validity": 0,
+                        "consistency": 0,
+                        "informativeness": 0
+                      },
+                      "warning_count": 0,
+                      "review_decision_counts": {
+                        "confirm": 0,
+                        "reject": 0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown identity or snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Selected snapshot not published",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Suggested retry delay in seconds when known",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quality/{metadata_version_id}": {
+      "get": {
+        "operationId": "quality_detail",
+        "parameters": [
+          {
+            "name": "metadata_version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "name": "snapshot_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QualityResponse"
+                },
+                "examples": {
+                  "quality_available": {
+                    "summary": "Illustrative contract fixture",
+                    "value": {
+                      "context": {
+                        "contract_version": "cmdl-api-v1",
+                        "request_id": "00000000-0000-4000-8000-000000000001",
+                        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                        "protocol_id": "deskdrop-temporal-v1",
+                        "as_of_at": "2017-02-01T00:00:00Z",
+                        "request_time": "2026-10-19T09:00:00Z"
+                      },
+                      "quality": {
+                        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                        "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+                        "status": "available",
+                        "quality_run_id": "00000000-0000-4000-8000-000000000030",
+                        "checks_version": "illustrative-checks-v1",
+                        "dimensions": {
+                          "completeness": {
+                            "score": 1.0,
+                            "assessed_checks": 4,
+                            "passed_checks": 4,
+                            "unassessed_checks": 0
+                          },
+                          "validity": {
+                            "score": 1.0,
+                            "assessed_checks": 2,
+                            "passed_checks": 2,
+                            "unassessed_checks": 0
+                          },
+                          "consistency": {
+                            "score": 0.5,
+                            "assessed_checks": 2,
+                            "passed_checks": 1,
+                            "unassessed_checks": 0
+                          },
+                          "informativeness": {
+                            "score": 0.5,
+                            "assessed_checks": 2,
+                            "passed_checks": 1,
+                            "unassessed_checks": 0
+                          }
+                        },
+                        "overall_score": 0.75,
+                        "warnings": [
+                          {
+                            "warning_id": "00000000-0000-4000-8000-000000000040",
+                            "check_id": "language_consistency",
+                            "field": "lang",
+                            "dimension": "consistency",
+                            "severity": "warning",
+                            "reason": "Illustrative mismatch signal; actual language rules are T16.",
+                            "reviews": []
+                          },
+                          {
+                            "warning_id": "00000000-0000-4000-8000-000000000041",
+                            "check_id": "text_informativeness",
+                            "field": "text",
+                            "dimension": "informativeness",
+                            "severity": "warning",
+                            "reason": "Illustrative short-text signal; not a measured finding.",
+                            "reviews": []
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "quality_unavailable": {
+                    "summary": "Illustrative contract fixture",
+                    "value": {
+                      "context": {
+                        "contract_version": "cmdl-api-v1",
+                        "request_id": "00000000-0000-4000-8000-000000000001",
+                        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                        "protocol_id": "deskdrop-temporal-v1",
+                        "as_of_at": "2017-02-01T00:00:00Z",
+                        "request_time": "2026-10-19T09:00:00Z"
+                      },
+                      "quality": {
+                        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                        "metadata_version_id": "00000000-0000-4000-8000-000000000021",
+                        "status": "unavailable",
+                        "reason": "not_run",
+                        "quality_run_id": null,
+                        "checks_version": null,
+                        "dimensions": null,
+                        "overall_score": null,
+                        "warnings": []
+                      }
+                    }
+                  },
+                  "quality_partial": {
+                    "summary": "Illustrative contract fixture",
+                    "value": {
+                      "context": {
+                        "contract_version": "cmdl-api-v1",
+                        "request_id": "00000000-0000-4000-8000-000000000001",
+                        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                        "protocol_id": "deskdrop-temporal-v1",
+                        "as_of_at": "2017-02-01T00:00:00Z",
+                        "request_time": "2026-10-19T09:00:00Z"
+                      },
+                      "quality": {
+                        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                        "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+                        "status": "available",
+                        "quality_run_id": "00000000-0000-4000-8000-000000000031",
+                        "checks_version": "illustrative-partial-checks-v1",
+                        "dimensions": {
+                          "completeness": {
+                            "score": 1.0,
+                            "assessed_checks": 4,
+                            "passed_checks": 4,
+                            "unassessed_checks": 0
+                          },
+                          "validity": {
+                            "score": 1.0,
+                            "assessed_checks": 2,
+                            "passed_checks": 2,
+                            "unassessed_checks": 0
+                          },
+                          "consistency": {
+                            "score": null,
+                            "assessed_checks": 0,
+                            "passed_checks": 0,
+                            "unassessed_checks": 1
+                          },
+                          "informativeness": {
+                            "score": 0.5,
+                            "assessed_checks": 2,
+                            "passed_checks": 1,
+                            "unassessed_checks": 0
+                          }
+                        },
+                        "overall_score": null,
+                        "warnings": [
+                          {
+                            "warning_id": "00000000-0000-4000-8000-000000000041",
+                            "check_id": "text_informativeness",
+                            "field": "text",
+                            "dimension": "informativeness",
+                            "severity": "warning",
+                            "reason": "Illustrative short-text signal; not a measured finding.",
+                            "reviews": []
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "quality_review_history": {
+                    "summary": "Illustrative contract fixture",
+                    "value": {
+                      "context": {
+                        "contract_version": "cmdl-api-v1",
+                        "request_id": "00000000-0000-4000-8000-000000000001",
+                        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                        "protocol_id": "deskdrop-temporal-v1",
+                        "as_of_at": "2017-02-01T00:00:00Z",
+                        "request_time": "2026-10-19T09:00:00Z"
+                      },
+                      "quality": {
+                        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                        "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+                        "status": "available",
+                        "quality_run_id": "00000000-0000-4000-8000-000000000030",
+                        "checks_version": "illustrative-checks-v1",
+                        "dimensions": {
+                          "completeness": {
+                            "score": 1.0,
+                            "assessed_checks": 4,
+                            "passed_checks": 4,
+                            "unassessed_checks": 0
+                          },
+                          "validity": {
+                            "score": 1.0,
+                            "assessed_checks": 2,
+                            "passed_checks": 2,
+                            "unassessed_checks": 0
+                          },
+                          "consistency": {
+                            "score": 0.5,
+                            "assessed_checks": 2,
+                            "passed_checks": 1,
+                            "unassessed_checks": 0
+                          },
+                          "informativeness": {
+                            "score": 0.5,
+                            "assessed_checks": 2,
+                            "passed_checks": 1,
+                            "unassessed_checks": 0
+                          }
+                        },
+                        "overall_score": 0.75,
+                        "warnings": [
+                          {
+                            "warning_id": "00000000-0000-4000-8000-000000000040",
+                            "check_id": "language_consistency",
+                            "field": "lang",
+                            "dimension": "consistency",
+                            "severity": "warning",
+                            "reason": "Illustrative mismatch signal; actual language rules are T16.",
+                            "reviews": [
+                              {
+                                "client_request_id": "00000000-0000-4000-8000-000000000070",
+                                "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                                "quality_run_id": "00000000-0000-4000-8000-000000000030",
+                                "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+                                "reviewer_label": "reviewer-a",
+                                "decision": "confirm",
+                                "comment": null,
+                                "review_id": "00000000-0000-4000-8000-000000000071",
+                                "warning_id": "00000000-0000-4000-8000-000000000040",
+                                "created_at": "2026-10-19T09:01:00Z"
+                              }
+                            ]
+                          },
+                          {
+                            "warning_id": "00000000-0000-4000-8000-000000000041",
+                            "check_id": "text_informativeness",
+                            "field": "text",
+                            "dimension": "informativeness",
+                            "severity": "warning",
+                            "reason": "Illustrative short-text signal; not a measured finding.",
+                            "reviews": []
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown identity or snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, publication or idempotency conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Suggested retry delay in seconds when known",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quality/warnings/{warning_id}/reviews": {
+      "post": {
+        "operationId": "submit_review",
+        "parameters": [
+          {
+            "name": "warning_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Identical idempotent replay; same row and timestamp",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewDecision"
+                },
+                "examples": {
+                  "review_replayed": {
+                    "summary": "Illustrative contract fixture",
+                    "value": {
+                      "client_request_id": "00000000-0000-4000-8000-000000000070",
+                      "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                      "quality_run_id": "00000000-0000-4000-8000-000000000030",
+                      "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+                      "reviewer_label": "reviewer-a",
+                      "decision": "confirm",
+                      "comment": null,
+                      "review_id": "00000000-0000-4000-8000-000000000071",
+                      "warning_id": "00000000-0000-4000-8000-000000000040",
+                      "created_at": "2026-10-19T09:01:00Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown identity or snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, publication or idempotency conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "version_conflict": {
+                    "summary": "Illustrative contract fixture",
+                    "value": {
+                      "request_id": "00000000-0000-4000-8000-000000000001",
+                      "code": "VersionMismatch",
+                      "message": "Warning does not belong to the supplied metadata/run/snapshot tuple.",
+                      "retryable": false,
+                      "issues": []
+                    }
+                  },
+                  "idempotency_conflict": {
+                    "summary": "Illustrative contract fixture",
+                    "value": {
+                      "request_id": "00000000-0000-4000-8000-000000000001",
+                      "code": "IdempotencyConflict",
+                      "message": "Request key already used with a different payload.",
+                      "retryable": false,
+                      "issues": []
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Suggested retry delay in seconds when known",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "New append-only decision",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewDecision"
+                },
+                "examples": {
+                  "review_created": {
+                    "summary": "Illustrative contract fixture",
+                    "value": {
+                      "client_request_id": "00000000-0000-4000-8000-000000000070",
+                      "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                      "quality_run_id": "00000000-0000-4000-8000-000000000030",
+                      "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+                      "reviewer_label": "reviewer-a",
+                      "decision": "confirm",
+                      "comment": null,
+                      "review_id": "00000000-0000-4000-8000-000000000071",
+                      "warning_id": "00000000-0000-4000-8000-000000000040",
+                      "created_at": "2026-10-19T09:01:00Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewRequest"
+              },
+              "examples": {
+                "review_created": {
+                  "value": {
+                    "client_request_id": "00000000-0000-4000-8000-000000000070",
+                    "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                    "quality_run_id": "00000000-0000-4000-8000-000000000030",
+                    "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+                    "reviewer_label": "reviewer-a",
+                    "decision": "confirm",
+                    "comment": null
+                  }
+                },
+                "review_replayed": {
+                  "value": {
+                    "client_request_id": "00000000-0000-4000-8000-000000000070",
+                    "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                    "quality_run_id": "00000000-0000-4000-8000-000000000030",
+                    "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+                    "reviewer_label": "reviewer-a",
+                    "decision": "confirm",
+                    "comment": null
+                  }
+                },
+                "version_conflict": {
+                  "value": {
+                    "client_request_id": "00000000-0000-4000-8000-000000000070",
+                    "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                    "quality_run_id": "00000000-0000-4000-8000-000000000030",
+                    "metadata_version_id": "00000000-0000-4000-8000-000000000021",
+                    "reviewer_label": "reviewer-a",
+                    "decision": "confirm",
+                    "comment": null
+                  }
+                },
+                "idempotency_conflict": {
+                  "value": {
+                    "client_request_id": "00000000-0000-4000-8000-000000000070",
+                    "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                    "quality_run_id": "00000000-0000-4000-8000-000000000030",
+                    "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+                    "reviewer_label": "reviewer-a",
+                    "decision": "reject",
+                    "comment": null
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SourceId": {
+        "type": "string",
+        "pattern": "^-?(0|[1-9][0-9]*)$",
+        "not": {
+          "pattern": "\\s"
+        },
+        "description": "Exact source identifier; never a JSON number."
+      },
+      "Uuid": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "UtcTimestamp": {
+        "type": "string",
+        "format": "date-time",
+        "pattern": "Z$"
+      },
+      "Context": {
+        "type": "object",
+        "properties": {
+          "contract_version": {
+            "const": "cmdl-api-v1"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "snapshot_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "protocol_id": {
+            "const": "deskdrop-temporal-v1"
+          },
+          "as_of_at": {
+            "$ref": "#/components/schemas/UtcTimestamp"
+          },
+          "request_time": {
+            "$ref": "#/components/schemas/UtcTimestamp"
+          }
+        },
+        "required": [
+          "contract_version",
+          "request_id",
+          "snapshot_id",
+          "protocol_id",
+          "as_of_at",
+          "request_time"
+        ],
+        "additionalProperties": false
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "request_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "InvalidInput",
+              "UnknownSnapshot",
+              "SnapshotNotPublished",
+              "UnknownArticle",
+              "ReferenceUnavailable",
+              "UnknownMetadataVersion",
+              "VersionMismatch",
+              "UnknownWarning",
+              "IdempotencyConflict",
+              "DependencyUnavailable"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1
+          },
+          "retryable": {
+            "type": "boolean"
+          },
+          "issues": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "field",
+                "message"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "request_id",
+          "code",
+          "message",
+          "retryable",
+          "issues"
+        ],
+        "additionalProperties": false
+      },
+      "Dimension": {
+        "type": "object",
+        "properties": {
+          "score": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "assessed_checks": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "passed_checks": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "unassessed_checks": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "score",
+          "assessed_checks",
+          "passed_checks",
+          "unassessed_checks"
+        ],
+        "additionalProperties": false
+      },
+      "Dimensions": {
+        "type": "object",
+        "properties": {
+          "completeness": {
+            "$ref": "#/components/schemas/Dimension"
+          },
+          "validity": {
+            "$ref": "#/components/schemas/Dimension"
+          },
+          "consistency": {
+            "$ref": "#/components/schemas/Dimension"
+          },
+          "informativeness": {
+            "$ref": "#/components/schemas/Dimension"
+          }
+        },
+        "required": [
+          "completeness",
+          "validity",
+          "consistency",
+          "informativeness"
+        ],
+        "additionalProperties": false
+      },
+      "ReviewRequest": {
+        "type": "object",
+        "properties": {
+          "client_request_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "snapshot_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "quality_run_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "metadata_version_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "reviewer_label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "\\S"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "confirm",
+              "reject"
+            ]
+          },
+          "comment": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "client_request_id",
+          "snapshot_id",
+          "quality_run_id",
+          "metadata_version_id",
+          "reviewer_label",
+          "decision"
+        ],
+        "additionalProperties": false
+      },
+      "ReviewDecision": {
+        "type": "object",
+        "properties": {
+          "client_request_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "snapshot_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "quality_run_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "metadata_version_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "reviewer_label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "\\S"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "confirm",
+              "reject"
+            ]
+          },
+          "comment": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 1000
+          },
+          "review_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "warning_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "created_at": {
+            "$ref": "#/components/schemas/UtcTimestamp"
+          }
+        },
+        "required": [
+          "client_request_id",
+          "snapshot_id",
+          "quality_run_id",
+          "metadata_version_id",
+          "reviewer_label",
+          "decision",
+          "comment",
+          "review_id",
+          "warning_id",
+          "created_at"
+        ],
+        "additionalProperties": false
+      },
+      "Warning": {
+        "type": "object",
+        "properties": {
+          "warning_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "check_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "field": {
+            "type": "string",
+            "enum": [
+              "title",
+              "text",
+              "url",
+              "lang",
+              "content_type",
+              "record"
+            ]
+          },
+          "dimension": {
+            "type": "string",
+            "enum": [
+              "completeness",
+              "validity",
+              "consistency",
+              "informativeness"
+            ]
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "info",
+              "warning",
+              "error"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reviews": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReviewDecision"
+            }
+          }
+        },
+        "required": [
+          "warning_id",
+          "check_id",
+          "field",
+          "dimension",
+          "severity",
+          "reason",
+          "reviews"
+        ],
+        "additionalProperties": false
+      },
+      "AvailableQuality": {
+        "type": "object",
+        "properties": {
+          "snapshot_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "metadata_version_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "status": {
+            "const": "available"
+          },
+          "quality_run_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "checks_version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "dimensions": {
+            "$ref": "#/components/schemas/Dimensions"
+          },
+          "overall_score": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Warning"
+            }
+          }
+        },
+        "required": [
+          "snapshot_id",
+          "metadata_version_id",
+          "status",
+          "quality_run_id",
+          "checks_version",
+          "dimensions",
+          "overall_score",
+          "warnings"
+        ],
+        "additionalProperties": false
+      },
+      "UnavailableQuality": {
+        "type": "object",
+        "properties": {
+          "snapshot_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "metadata_version_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "status": {
+            "const": "unavailable"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "not_run",
+              "pending",
+              "failed",
+              "version_mismatch"
+            ]
+          },
+          "quality_run_id": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "checks_version": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "dimensions": {
+            "type": "null"
+          },
+          "overall_score": {
+            "type": "null"
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Warning"
+            },
+            "maxItems": 0
+          }
+        },
+        "required": [
+          "snapshot_id",
+          "metadata_version_id",
+          "status",
+          "reason",
+          "quality_run_id",
+          "checks_version",
+          "dimensions",
+          "overall_score",
+          "warnings"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "reason": {
+                  "enum": [
+                    "not_run",
+                    "version_mismatch"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "quality_run_id": {
+                  "type": "null"
+                },
+                "checks_version": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Quality": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/AvailableQuality"
+          },
+          {
+            "$ref": "#/components/schemas/UnavailableQuality"
+          }
+        ]
+      },
+      "Metadata": {
+        "type": "object",
+        "properties": {
+          "variant_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "share_event_at": {
+            "$ref": "#/components/schemas/UtcTimestamp"
+          },
+          "title": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "lang": {
+            "type": "string"
+          },
+          "content_type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "variant_id",
+          "share_event_at",
+          "title",
+          "text",
+          "url",
+          "lang",
+          "content_type"
+        ],
+        "additionalProperties": false
+      },
+      "Article": {
+        "type": "object",
+        "properties": {
+          "content_id": {
+            "$ref": "#/components/schemas/SourceId"
+          },
+          "availability": {
+            "type": "string",
+            "enum": [
+              "available",
+              "not_shared",
+              "removed",
+              "ambiguous"
+            ]
+          },
+          "metadata_version_id": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Metadata"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "content_id",
+          "availability",
+          "metadata_version_id",
+          "metadata"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "availability": {
+                  "const": "available"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "metadata_version_id": {
+                  "$ref": "#/components/schemas/Uuid"
+                },
+                "metadata": {
+                  "$ref": "#/components/schemas/Metadata"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "metadata_version_id": {
+                  "type": "null"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "metadata": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "metadata": {
+                  "$ref": "#/components/schemas/Metadata"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "RankedItem": {
+        "type": "object",
+        "properties": {
+          "rank": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "article": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Article"
+              },
+              {
+                "properties": {
+                  "availability": {
+                    "const": "available"
+                  }
+                }
+              }
+            ]
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "primary",
+              "popularity"
+            ]
+          },
+          "model_run_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "feature_set_id": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "explanation": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "collaborative",
+                  "content",
+                  "hybrid",
+                  "popular"
+                ]
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "code",
+              "text"
+            ],
+            "additionalProperties": false
+          },
+          "quality": {
+            "$ref": "#/components/schemas/Quality"
+          }
+        },
+        "required": [
+          "rank",
+          "article",
+          "source",
+          "model_run_id",
+          "feature_set_id",
+          "explanation",
+          "quality"
+        ],
+        "additionalProperties": false
+      },
+      "RecommendationResponse": {
+        "type": "object",
+        "properties": {
+          "person_id": {
+            "$ref": "#/components/schemas/SourceId"
+          },
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "ranking_set_id": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "primary_model_run_id": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fallback_model_run_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "returned_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "short_result": {
+            "type": "boolean"
+          },
+          "fallback_reasons": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "unknown_user",
+                "insufficient_history",
+                "missing_prepared_ranking",
+                "prepared_candidates_exhausted",
+                "unsupported_reference",
+                "no_eligible_candidates"
+              ]
+            },
+            "uniqueItems": true
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RankedItem"
+            },
+            "maxItems": 10
+          }
+        },
+        "required": [
+          "person_id",
+          "context",
+          "ranking_set_id",
+          "primary_model_run_id",
+          "fallback_model_run_id",
+          "limit",
+          "returned_count",
+          "short_result",
+          "fallback_reasons",
+          "items"
+        ],
+        "additionalProperties": false
+      },
+      "SimilarResponse": {
+        "type": "object",
+        "properties": {
+          "content_id": {
+            "$ref": "#/components/schemas/SourceId"
+          },
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "ranking_set_id": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "primary_model_run_id": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fallback_model_run_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "returned_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "short_result": {
+            "type": "boolean"
+          },
+          "fallback_reasons": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "unknown_user",
+                "insufficient_history",
+                "missing_prepared_ranking",
+                "prepared_candidates_exhausted",
+                "unsupported_reference",
+                "no_eligible_candidates"
+              ]
+            },
+            "uniqueItems": true
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RankedItem"
+            },
+            "maxItems": 10
+          }
+        },
+        "required": [
+          "content_id",
+          "context",
+          "ranking_set_id",
+          "primary_model_run_id",
+          "fallback_model_run_id",
+          "limit",
+          "returned_count",
+          "short_result",
+          "fallback_reasons",
+          "items"
+        ],
+        "additionalProperties": false
+      },
+      "ArticleResponse": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "article": {
+            "$ref": "#/components/schemas/Article"
+          }
+        },
+        "required": [
+          "context",
+          "article"
+        ],
+        "additionalProperties": false
+      },
+      "QualityResponse": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "quality": {
+            "$ref": "#/components/schemas/Quality"
+          }
+        },
+        "required": [
+          "context",
+          "quality"
+        ],
+        "additionalProperties": false
+      },
+      "QualityReportResponse": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "unavailable"
+            ]
+          },
+          "quality_run_id": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "checks_version": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "not_run",
+                  "pending",
+                  "failed"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "catalog_records": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "assessed_records": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "unassessed_records": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "dimension_means": {
+            "type": "object",
+            "properties": {
+              "completeness": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "validity": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "consistency": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "informativeness": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "completeness",
+              "validity",
+              "consistency",
+              "informativeness"
+            ],
+            "additionalProperties": false
+          },
+          "dimension_denominators": {
+            "type": "object",
+            "properties": {
+              "completeness": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "validity": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "consistency": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "informativeness": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "completeness",
+              "validity",
+              "consistency",
+              "informativeness"
+            ],
+            "additionalProperties": false
+          },
+          "warning_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "review_decision_counts": {
+            "type": "object",
+            "properties": {
+              "confirm": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "reject": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "confirm",
+              "reject"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "context",
+          "status",
+          "quality_run_id",
+          "checks_version",
+          "reason",
+          "catalog_records",
+          "assessed_records",
+          "unassessed_records",
+          "dimension_means",
+          "dimension_denominators",
+          "warning_count",
+          "review_decision_counts"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "available"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "quality_run_id": {
+                  "$ref": "#/components/schemas/Uuid"
+                },
+                "checks_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "reason": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "assessed_records": {
+                  "const": 0
+                },
+                "warning_count": {
+                  "const": 0
+                },
+                "dimension_means": {
+                  "type": "object",
+                  "properties": {
+                    "completeness": {
+                      "type": "null"
+                    },
+                    "validity": {
+                      "type": "null"
+                    },
+                    "consistency": {
+                      "type": "null"
+                    },
+                    "informativeness": {
+                      "type": "null"
+                    }
+                  },
+                  "required": [
+                    "completeness",
+                    "validity",
+                    "consistency",
+                    "informativeness"
+                  ],
+                  "additionalProperties": false
+                },
+                "dimension_denominators": {
+                  "type": "object",
+                  "properties": {
+                    "completeness": {
+                      "const": 0
+                    },
+                    "validity": {
+                      "const": 0
+                    },
+                    "consistency": {
+                      "const": 0
+                    },
+                    "informativeness": {
+                      "const": 0
+                    }
+                  },
+                  "required": [
+                    "completeness",
+                    "validity",
+                    "consistency",
+                    "informativeness"
+                  ],
+                  "additionalProperties": false
+                },
+                "review_decision_counts": {
+                  "type": "object",
+                  "properties": {
+                    "confirm": {
+                      "const": 0
+                    },
+                    "reject": {
+                      "const": 0
+                    }
+                  },
+                  "required": [
+                    "confirm",
+                    "reject"
+                  ],
+                  "additionalProperties": false
+                },
+                "reason": {
+                  "type": "string",
+                  "enum": [
+                    "not_run",
+                    "pending",
+                    "failed"
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Ready": {
+        "type": "object",
+        "properties": {
+          "contract_version": {
+            "const": "cmdl-api-v1"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "status": {
+            "const": "ready"
+          },
+          "active_snapshot_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "as_of_at": {
+            "$ref": "#/components/schemas/UtcTimestamp"
+          },
+          "request_time": {
+            "$ref": "#/components/schemas/UtcTimestamp"
+          }
+        },
+        "required": [
+          "contract_version",
+          "request_id",
+          "status",
+          "active_snapshot_id",
+          "as_of_at",
+          "request_time"
+        ],
+        "additionalProperties": false
+      }
+    }
+  }
+}

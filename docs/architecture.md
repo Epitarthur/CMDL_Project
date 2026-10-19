@@ -34,4 +34,7 @@ runs, field warnings, review decisions, model runs and prepared rankings. Preser
 source file checksum and row number. Distinguish import idempotency from genuine
 source duplicate handling. Do not infer publication dates from sharing timestamps.
 
-Exact schema and Compose configuration remain implementation work.
+The entity/key/version design is specified in [database contract v1](database-schema.md),
+with [API contracts and examples](contracts.md). T04’s artifacts are ready for human
+review. Executable migrations are T06 and service implementation is T21; Compose
+remains T05. T04 introduces no running database or HTTP services.

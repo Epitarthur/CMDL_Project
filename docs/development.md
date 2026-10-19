@@ -74,3 +74,18 @@ uv run python scripts/reconcile_slides.py '/path/to/CMDL-Part-2-Final.pptx'
 
 The deck stays outside the repository; its checksum and checked claims are retained
 in `evidence/slide-reconciliation.json`. These commands do not modify the inputs.
+
+## T04 contract validation
+
+The dev lockfile includes JSON Schema and OpenAPI validators; the application still
+has no runtime dependencies. The ordinary `uv run pytest` CI command now validates
+`docs/api/openapi.json`, all 23 illustrative request/response examples, their embedded
+OpenAPI copies, and example snapshot/metadata/model/feature/check relationships.
+
+64 tests pass locally after T04 (17 source/provenance tests and 47 contract checks).
+Negative examples cover numeric/rounded IDs, non-UTC and invalid dates, invalid limits,
+review payloads, unavailable quality with numeric scores, reordered ranks, future
+metadata, incompatible model/quality versions, and incomplete coverage with an
+apparently complete aggregate. These check the design artifacts; migrations and live
+API enforcement are T06/T21. Readiness, ordering and review persistence still need
+runtime integration tests once those services exist.

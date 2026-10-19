@@ -8,6 +8,7 @@ Python package, locked development tooling, CI workflow and a tested source-data
 profiler are implemented. Application services, models, database migrations and
 Docker services remain planned. T01–T03 are complete: benchmark v1 is approved,
 dataset version/license and presentation counts are verified, and CI has passed.
+T04’s database/API contract package is specified and ready for human review.
 
 ## Planned stack
 
@@ -19,7 +20,9 @@ run on a teammate’s laptop. Preparation and training run as explicit batch job
 - [Implementation tickets and acceptance criteria](TODO.md)
 
 - [Architecture and repository layout](docs/architecture.md)
-- [Shared contracts](docs/contracts.md)
+- [Shared API contract](docs/contracts.md)
+- [Database schema specification](docs/database-schema.md)
+- [OpenAPI document](docs/api/openapi.json) and [illustrative examples](docs/api/examples.json)
 - [Evaluation plan](docs/evaluation.md)
 - [Team ownership and delivery sequence](docs/delivery.md)
 - [Decisions and open questions](docs/decisions.md)

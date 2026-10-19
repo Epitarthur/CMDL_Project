@@ -1,6 +1,6 @@
 # Project TODO and implementation tickets
 
-Status: T01–T03 completed on 2026-10-19 following Florian’s explicit approval and closure instruction. Benchmark v1 is frozen, publisher version/license and current slide counts are verified, and tooling/CI pass. T04 onward remain planned.
+Status: T01–T03 completed on 2026-10-19 following Florian’s explicit approval and closure instruction. Benchmark v1 is frozen, publisher version/license and current slide counts are verified, and tooling/CI pass. T04 is specified and validated, pending human review; T05 onward remain planned.
 
 Tickets are local planning records, not GitHub Issues. Owners are defaults. Dependencies use ticket numbers; work within a phase may proceed in parallel when dependencies permit. Update status and link implementation commits/PRs and evidence as work completes.
 
@@ -49,6 +49,8 @@ Tickets are local planning records, not GitHub Issues. Owners are defaults. Depe
 **Validate / acceptance:** Fresh environment installs the package; lint and meaningful tests run in CI; generated outputs and local secrets remain ignored.
 
 ### [ ] T04 — Freeze schema and service payloads
+
+**Ready for review (2026-10-19):** `docs/database-schema.md` specifies `cmdl-storage-v1` entities, keys, publication rules and indexes. `docs/contracts.md` and `docs/api/openapi.json` specify `cmdl-api-v1`: seven routes, quality score semantics, version matching, deterministic fallback, review idempotency and errors. `docs/api/examples.json` contains 23 illustrative examples with lineage. OpenAPI, payload and cross-field fixture checks pass. Human review of the representative examples is still required; no contributor signatures are claimed. No migrations or services have been implemented by T04.
 
 **Owner:** Florian + Arthur + Charly + Youssef  
 **Depends on:** T01, T02

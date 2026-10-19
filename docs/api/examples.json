@@ -1,0 +1,1084 @@
+{
+  "lineage": {
+    "snapshots": {
+      "00000000-0000-4000-8000-000000000010": {
+        "protocol_id": "deskdrop-temporal-v1",
+        "as_of_at": "2017-02-01T00:00:00Z"
+      }
+    },
+    "metadata_versions": {
+      "00000000-0000-4000-8000-000000000020": {
+        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+        "content_id": "9223372036854775807"
+      },
+      "00000000-0000-4000-8000-000000000021": {
+        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+        "content_id": "-6451309518266745024"
+      }
+    },
+    "feature_sets": {
+      "00000000-0000-4000-8000-000000000060": {
+        "snapshot_id": "00000000-0000-4000-8000-000000000010"
+      }
+    },
+    "quality_runs": {
+      "00000000-0000-4000-8000-000000000030": {
+        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+        "checks_version": "illustrative-checks-v1"
+      },
+      "00000000-0000-4000-8000-000000000031": {
+        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+        "checks_version": "illustrative-partial-checks-v1"
+      }
+    },
+    "model_runs": {
+      "00000000-0000-4000-8000-000000000050": {
+        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+        "feature_set_id": "00000000-0000-4000-8000-000000000060"
+      },
+      "00000000-0000-4000-8000-000000000051": {
+        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+        "feature_set_id": null
+      }
+    },
+    "ranking_sets": {
+      "00000000-0000-4000-8000-000000000080": {
+        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+        "model_run_id": "00000000-0000-4000-8000-000000000050",
+        "kind": "user"
+      },
+      "00000000-0000-4000-8000-000000000081": {
+        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+        "model_run_id": "00000000-0000-4000-8000-000000000050",
+        "kind": "similar"
+      }
+    }
+  },
+  "notice": "Illustrative fixtures only; no trained model scores or measured quality findings.",
+  "examples": [
+    {
+      "name": "ready",
+      "operation_id": "readiness",
+      "http_status": 200,
+      "body": {
+        "contract_version": "cmdl-api-v1",
+        "request_id": "00000000-0000-4000-8000-000000000001",
+        "status": "ready",
+        "active_snapshot_id": "00000000-0000-4000-8000-000000000010",
+        "as_of_at": "2017-02-01T00:00:00Z",
+        "request_time": "2026-10-19T09:00:00Z"
+      }
+    },
+    {
+      "name": "personalized",
+      "operation_id": "recommend",
+      "http_status": 200,
+      "body": {
+        "person_id": "-8845298781299428018",
+        "context": {
+          "contract_version": "cmdl-api-v1",
+          "request_id": "00000000-0000-4000-8000-000000000001",
+          "snapshot_id": "00000000-0000-4000-8000-000000000010",
+          "protocol_id": "deskdrop-temporal-v1",
+          "as_of_at": "2017-02-01T00:00:00Z",
+          "request_time": "2026-10-19T09:00:00Z"
+        },
+        "ranking_set_id": "00000000-0000-4000-8000-000000000080",
+        "primary_model_run_id": "00000000-0000-4000-8000-000000000050",
+        "fallback_model_run_id": "00000000-0000-4000-8000-000000000051",
+        "limit": 2,
+        "returned_count": 2,
+        "short_result": false,
+        "fallback_reasons": [],
+        "items": [
+          {
+            "rank": 1,
+            "article": {
+              "content_id": "9223372036854775807",
+              "availability": "available",
+              "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+              "metadata": {
+                "variant_id": "original",
+                "share_event_at": "2017-01-10T10:00:00Z",
+                "title": "Illustrative article about data systems",
+                "text": "Synthetic text for reviewing the contract.",
+                "url": "https://example.org/articles/data",
+                "lang": "en",
+                "content_type": "HTML"
+              }
+            },
+            "source": "primary",
+            "model_run_id": "00000000-0000-4000-8000-000000000050",
+            "feature_set_id": "00000000-0000-4000-8000-000000000060",
+            "explanation": {
+              "code": "hybrid",
+              "text": "Illustrative blend of content and historical interaction signals."
+            },
+            "quality": {
+              "snapshot_id": "00000000-0000-4000-8000-000000000010",
+              "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+              "status": "available",
+              "quality_run_id": "00000000-0000-4000-8000-000000000030",
+              "checks_version": "illustrative-checks-v1",
+              "dimensions": {
+                "completeness": {
+                  "score": 1.0,
+                  "assessed_checks": 4,
+                  "passed_checks": 4,
+                  "unassessed_checks": 0
+                },
+                "validity": {
+                  "score": 1.0,
+                  "assessed_checks": 2,
+                  "passed_checks": 2,
+                  "unassessed_checks": 0
+                },
+                "consistency": {
+                  "score": 0.5,
+                  "assessed_checks": 2,
+                  "passed_checks": 1,
+                  "unassessed_checks": 0
+                },
+                "informativeness": {
+                  "score": 0.5,
+                  "assessed_checks": 2,
+                  "passed_checks": 1,
+                  "unassessed_checks": 0
+                }
+              },
+              "overall_score": 0.75,
+              "warnings": [
+                {
+                  "warning_id": "00000000-0000-4000-8000-000000000040",
+                  "check_id": "language_consistency",
+                  "field": "lang",
+                  "dimension": "consistency",
+                  "severity": "warning",
+                  "reason": "Illustrative mismatch signal; actual language rules are T16.",
+                  "reviews": []
+                },
+                {
+                  "warning_id": "00000000-0000-4000-8000-000000000041",
+                  "check_id": "text_informativeness",
+                  "field": "text",
+                  "dimension": "informativeness",
+                  "severity": "warning",
+                  "reason": "Illustrative short-text signal; not a measured finding.",
+                  "reviews": []
+                }
+              ]
+            }
+          },
+          {
+            "rank": 2,
+            "article": {
+              "content_id": "-6451309518266745024",
+              "availability": "available",
+              "metadata_version_id": "00000000-0000-4000-8000-000000000021",
+              "metadata": {
+                "variant_id": "original",
+                "share_event_at": "2017-01-10T10:00:00Z",
+                "title": "Second illustrative article",
+                "text": "Synthetic text for reviewing the contract.",
+                "url": "https://example.org/articles/data",
+                "lang": "en",
+                "content_type": "HTML"
+              }
+            },
+            "source": "primary",
+            "model_run_id": "00000000-0000-4000-8000-000000000050",
+            "feature_set_id": "00000000-0000-4000-8000-000000000060",
+            "explanation": {
+              "code": "hybrid",
+              "text": "Illustrative blend of content and historical interaction signals."
+            },
+            "quality": {
+              "snapshot_id": "00000000-0000-4000-8000-000000000010",
+              "metadata_version_id": "00000000-0000-4000-8000-000000000021",
+              "status": "unavailable",
+              "reason": "not_run",
+              "quality_run_id": null,
+              "checks_version": null,
+              "dimensions": null,
+              "overall_score": null,
+              "warnings": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "cold_start_short",
+      "operation_id": "recommend",
+      "http_status": 200,
+      "body": {
+        "person_id": "999999999999999999",
+        "context": {
+          "contract_version": "cmdl-api-v1",
+          "request_id": "00000000-0000-4000-8000-000000000001",
+          "snapshot_id": "00000000-0000-4000-8000-000000000010",
+          "protocol_id": "deskdrop-temporal-v1",
+          "as_of_at": "2017-02-01T00:00:00Z",
+          "request_time": "2026-10-19T09:00:00Z"
+        },
+        "ranking_set_id": null,
+        "primary_model_run_id": null,
+        "fallback_model_run_id": "00000000-0000-4000-8000-000000000051",
+        "limit": 10,
+        "returned_count": 1,
+        "short_result": true,
+        "fallback_reasons": [
+          "unknown_user"
+        ],
+        "items": [
+          {
+            "rank": 1,
+            "article": {
+              "content_id": "-6451309518266745024",
+              "availability": "available",
+              "metadata_version_id": "00000000-0000-4000-8000-000000000021",
+              "metadata": {
+                "variant_id": "original",
+                "share_event_at": "2017-01-10T10:00:00Z",
+                "title": "Illustrative article about data systems",
+                "text": "Synthetic text for reviewing the contract.",
+                "url": "https://example.org/articles/data",
+                "lang": "en",
+                "content_type": "HTML"
+              }
+            },
+            "source": "popularity",
+            "model_run_id": "00000000-0000-4000-8000-000000000051",
+            "feature_set_id": null,
+            "explanation": {
+              "code": "popular",
+              "text": "Popular among eligible historical interactions."
+            },
+            "quality": {
+              "snapshot_id": "00000000-0000-4000-8000-000000000010",
+              "metadata_version_id": "00000000-0000-4000-8000-000000000021",
+              "status": "unavailable",
+              "reason": "not_run",
+              "quality_run_id": null,
+              "checks_version": null,
+              "dimensions": null,
+              "overall_score": null,
+              "warnings": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "mixed_primary_and_fallback",
+      "operation_id": "recommend",
+      "http_status": 200,
+      "body": {
+        "person_id": "-8845298781299428018",
+        "context": {
+          "contract_version": "cmdl-api-v1",
+          "request_id": "00000000-0000-4000-8000-000000000001",
+          "snapshot_id": "00000000-0000-4000-8000-000000000010",
+          "protocol_id": "deskdrop-temporal-v1",
+          "as_of_at": "2017-02-01T00:00:00Z",
+          "request_time": "2026-10-19T09:00:00Z"
+        },
+        "ranking_set_id": "00000000-0000-4000-8000-000000000080",
+        "primary_model_run_id": "00000000-0000-4000-8000-000000000050",
+        "fallback_model_run_id": "00000000-0000-4000-8000-000000000051",
+        "limit": 10,
+        "returned_count": 2,
+        "short_result": true,
+        "fallback_reasons": [
+          "prepared_candidates_exhausted"
+        ],
+        "items": [
+          {
+            "rank": 1,
+            "article": {
+              "content_id": "9223372036854775807",
+              "availability": "available",
+              "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+              "metadata": {
+                "variant_id": "original",
+                "share_event_at": "2017-01-10T10:00:00Z",
+                "title": "Illustrative article about data systems",
+                "text": "Synthetic text for reviewing the contract.",
+                "url": "https://example.org/articles/data",
+                "lang": "en",
+                "content_type": "HTML"
+              }
+            },
+            "source": "primary",
+            "model_run_id": "00000000-0000-4000-8000-000000000050",
+            "feature_set_id": "00000000-0000-4000-8000-000000000060",
+            "explanation": {
+              "code": "hybrid",
+              "text": "Illustrative blend of content and historical interaction signals."
+            },
+            "quality": {
+              "snapshot_id": "00000000-0000-4000-8000-000000000010",
+              "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+              "status": "available",
+              "quality_run_id": "00000000-0000-4000-8000-000000000030",
+              "checks_version": "illustrative-checks-v1",
+              "dimensions": {
+                "completeness": {
+                  "score": 1.0,
+                  "assessed_checks": 4,
+                  "passed_checks": 4,
+                  "unassessed_checks": 0
+                },
+                "validity": {
+                  "score": 1.0,
+                  "assessed_checks": 2,
+                  "passed_checks": 2,
+                  "unassessed_checks": 0
+                },
+                "consistency": {
+                  "score": 0.5,
+                  "assessed_checks": 2,
+                  "passed_checks": 1,
+                  "unassessed_checks": 0
+                },
+                "informativeness": {
+                  "score": 0.5,
+                  "assessed_checks": 2,
+                  "passed_checks": 1,
+                  "unassessed_checks": 0
+                }
+              },
+              "overall_score": 0.75,
+              "warnings": [
+                {
+                  "warning_id": "00000000-0000-4000-8000-000000000040",
+                  "check_id": "language_consistency",
+                  "field": "lang",
+                  "dimension": "consistency",
+                  "severity": "warning",
+                  "reason": "Illustrative mismatch signal; actual language rules are T16.",
+                  "reviews": []
+                },
+                {
+                  "warning_id": "00000000-0000-4000-8000-000000000041",
+                  "check_id": "text_informativeness",
+                  "field": "text",
+                  "dimension": "informativeness",
+                  "severity": "warning",
+                  "reason": "Illustrative short-text signal; not a measured finding.",
+                  "reviews": []
+                }
+              ]
+            }
+          },
+          {
+            "rank": 2,
+            "article": {
+              "content_id": "-6451309518266745024",
+              "availability": "available",
+              "metadata_version_id": "00000000-0000-4000-8000-000000000021",
+              "metadata": {
+                "variant_id": "original",
+                "share_event_at": "2017-01-10T10:00:00Z",
+                "title": "Illustrative article about data systems",
+                "text": "Synthetic text for reviewing the contract.",
+                "url": "https://example.org/articles/data",
+                "lang": "en",
+                "content_type": "HTML"
+              }
+            },
+            "source": "popularity",
+            "model_run_id": "00000000-0000-4000-8000-000000000051",
+            "feature_set_id": null,
+            "explanation": {
+              "code": "popular",
+              "text": "Popular among eligible historical interactions."
+            },
+            "quality": {
+              "snapshot_id": "00000000-0000-4000-8000-000000000010",
+              "metadata_version_id": "00000000-0000-4000-8000-000000000021",
+              "status": "unavailable",
+              "reason": "not_run",
+              "quality_run_id": null,
+              "checks_version": null,
+              "dimensions": null,
+              "overall_score": null,
+              "warnings": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "empty_catalog",
+      "operation_id": "recommend",
+      "http_status": 200,
+      "body": {
+        "person_id": "-8845298781299428018",
+        "context": {
+          "contract_version": "cmdl-api-v1",
+          "request_id": "00000000-0000-4000-8000-000000000001",
+          "snapshot_id": "00000000-0000-4000-8000-000000000010",
+          "protocol_id": "deskdrop-temporal-v1",
+          "as_of_at": "2017-02-01T00:00:00Z",
+          "request_time": "2026-10-19T09:00:00Z"
+        },
+        "ranking_set_id": "00000000-0000-4000-8000-000000000080",
+        "primary_model_run_id": "00000000-0000-4000-8000-000000000050",
+        "fallback_model_run_id": "00000000-0000-4000-8000-000000000051",
+        "limit": 1,
+        "returned_count": 0,
+        "short_result": true,
+        "fallback_reasons": [
+          "prepared_candidates_exhausted",
+          "no_eligible_candidates"
+        ],
+        "items": []
+      }
+    },
+    {
+      "name": "similar",
+      "operation_id": "similar",
+      "http_status": 200,
+      "body": {
+        "content_id": "-3499919498720038879",
+        "context": {
+          "contract_version": "cmdl-api-v1",
+          "request_id": "00000000-0000-4000-8000-000000000001",
+          "snapshot_id": "00000000-0000-4000-8000-000000000010",
+          "protocol_id": "deskdrop-temporal-v1",
+          "as_of_at": "2017-02-01T00:00:00Z",
+          "request_time": "2026-10-19T09:00:00Z"
+        },
+        "ranking_set_id": "00000000-0000-4000-8000-000000000081",
+        "primary_model_run_id": "00000000-0000-4000-8000-000000000050",
+        "fallback_model_run_id": "00000000-0000-4000-8000-000000000051",
+        "limit": 1,
+        "returned_count": 1,
+        "short_result": false,
+        "fallback_reasons": [],
+        "items": [
+          {
+            "rank": 1,
+            "article": {
+              "content_id": "9223372036854775807",
+              "availability": "available",
+              "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+              "metadata": {
+                "variant_id": "original",
+                "share_event_at": "2017-01-10T10:00:00Z",
+                "title": "Illustrative article about data systems",
+                "text": "Synthetic text for reviewing the contract.",
+                "url": "https://example.org/articles/data",
+                "lang": "en",
+                "content_type": "HTML"
+              }
+            },
+            "source": "primary",
+            "model_run_id": "00000000-0000-4000-8000-000000000050",
+            "feature_set_id": "00000000-0000-4000-8000-000000000060",
+            "explanation": {
+              "code": "content",
+              "text": "Content similarity from the selected feature version."
+            },
+            "quality": {
+              "snapshot_id": "00000000-0000-4000-8000-000000000010",
+              "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+              "status": "available",
+              "quality_run_id": "00000000-0000-4000-8000-000000000030",
+              "checks_version": "illustrative-checks-v1",
+              "dimensions": {
+                "completeness": {
+                  "score": 1.0,
+                  "assessed_checks": 4,
+                  "passed_checks": 4,
+                  "unassessed_checks": 0
+                },
+                "validity": {
+                  "score": 1.0,
+                  "assessed_checks": 2,
+                  "passed_checks": 2,
+                  "unassessed_checks": 0
+                },
+                "consistency": {
+                  "score": 0.5,
+                  "assessed_checks": 2,
+                  "passed_checks": 1,
+                  "unassessed_checks": 0
+                },
+                "informativeness": {
+                  "score": 0.5,
+                  "assessed_checks": 2,
+                  "passed_checks": 1,
+                  "unassessed_checks": 0
+                }
+              },
+              "overall_score": 0.75,
+              "warnings": [
+                {
+                  "warning_id": "00000000-0000-4000-8000-000000000040",
+                  "check_id": "language_consistency",
+                  "field": "lang",
+                  "dimension": "consistency",
+                  "severity": "warning",
+                  "reason": "Illustrative mismatch signal; actual language rules are T16.",
+                  "reviews": []
+                },
+                {
+                  "warning_id": "00000000-0000-4000-8000-000000000041",
+                  "check_id": "text_informativeness",
+                  "field": "text",
+                  "dimension": "informativeness",
+                  "severity": "warning",
+                  "reason": "Illustrative short-text signal; not a measured finding.",
+                  "reviews": []
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "article",
+      "operation_id": "article",
+      "http_status": 200,
+      "body": {
+        "context": {
+          "contract_version": "cmdl-api-v1",
+          "request_id": "00000000-0000-4000-8000-000000000001",
+          "snapshot_id": "00000000-0000-4000-8000-000000000010",
+          "protocol_id": "deskdrop-temporal-v1",
+          "as_of_at": "2017-02-01T00:00:00Z",
+          "request_time": "2026-10-19T09:00:00Z"
+        },
+        "article": {
+          "content_id": "9223372036854775807",
+          "availability": "available",
+          "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+          "metadata": {
+            "variant_id": "original",
+            "share_event_at": "2017-01-10T10:00:00Z",
+            "title": "Illustrative article about data systems",
+            "text": "Synthetic text for reviewing the contract.",
+            "url": "https://example.org/articles/data",
+            "lang": "en",
+            "content_type": "HTML"
+          }
+        }
+      }
+    },
+    {
+      "name": "removed_article",
+      "operation_id": "article",
+      "http_status": 200,
+      "body": {
+        "context": {
+          "contract_version": "cmdl-api-v1",
+          "request_id": "00000000-0000-4000-8000-000000000001",
+          "snapshot_id": "00000000-0000-4000-8000-000000000010",
+          "protocol_id": "deskdrop-temporal-v1",
+          "as_of_at": "2017-02-01T00:00:00Z",
+          "request_time": "2026-10-19T09:00:00Z"
+        },
+        "article": {
+          "content_id": "9223372036854775807",
+          "availability": "removed",
+          "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+          "metadata": {
+            "variant_id": "original",
+            "share_event_at": "2017-01-10T10:00:00Z",
+            "title": "Illustrative article about data systems",
+            "text": "Synthetic text for reviewing the contract.",
+            "url": "https://example.org/articles/data",
+            "lang": "en",
+            "content_type": "HTML"
+          }
+        }
+      }
+    },
+    {
+      "name": "no_future_metadata",
+      "operation_id": "article",
+      "http_status": 200,
+      "body": {
+        "context": {
+          "contract_version": "cmdl-api-v1",
+          "request_id": "00000000-0000-4000-8000-000000000001",
+          "snapshot_id": "00000000-0000-4000-8000-000000000010",
+          "protocol_id": "deskdrop-temporal-v1",
+          "as_of_at": "2017-02-01T00:00:00Z",
+          "request_time": "2026-10-19T09:00:00Z"
+        },
+        "article": {
+          "content_id": "100",
+          "availability": "not_shared",
+          "metadata_version_id": null,
+          "metadata": null
+        }
+      }
+    },
+    {
+      "name": "quality_available",
+      "operation_id": "quality_detail",
+      "http_status": 200,
+      "body": {
+        "context": {
+          "contract_version": "cmdl-api-v1",
+          "request_id": "00000000-0000-4000-8000-000000000001",
+          "snapshot_id": "00000000-0000-4000-8000-000000000010",
+          "protocol_id": "deskdrop-temporal-v1",
+          "as_of_at": "2017-02-01T00:00:00Z",
+          "request_time": "2026-10-19T09:00:00Z"
+        },
+        "quality": {
+          "snapshot_id": "00000000-0000-4000-8000-000000000010",
+          "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+          "status": "available",
+          "quality_run_id": "00000000-0000-4000-8000-000000000030",
+          "checks_version": "illustrative-checks-v1",
+          "dimensions": {
+            "completeness": {
+              "score": 1.0,
+              "assessed_checks": 4,
+              "passed_checks": 4,
+              "unassessed_checks": 0
+            },
+            "validity": {
+              "score": 1.0,
+              "assessed_checks": 2,
+              "passed_checks": 2,
+              "unassessed_checks": 0
+            },
+            "consistency": {
+              "score": 0.5,
+              "assessed_checks": 2,
+              "passed_checks": 1,
+              "unassessed_checks": 0
+            },
+            "informativeness": {
+              "score": 0.5,
+              "assessed_checks": 2,
+              "passed_checks": 1,
+              "unassessed_checks": 0
+            }
+          },
+          "overall_score": 0.75,
+          "warnings": [
+            {
+              "warning_id": "00000000-0000-4000-8000-000000000040",
+              "check_id": "language_consistency",
+              "field": "lang",
+              "dimension": "consistency",
+              "severity": "warning",
+              "reason": "Illustrative mismatch signal; actual language rules are T16.",
+              "reviews": []
+            },
+            {
+              "warning_id": "00000000-0000-4000-8000-000000000041",
+              "check_id": "text_informativeness",
+              "field": "text",
+              "dimension": "informativeness",
+              "severity": "warning",
+              "reason": "Illustrative short-text signal; not a measured finding.",
+              "reviews": []
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "quality_unavailable",
+      "operation_id": "quality_detail",
+      "http_status": 200,
+      "body": {
+        "context": {
+          "contract_version": "cmdl-api-v1",
+          "request_id": "00000000-0000-4000-8000-000000000001",
+          "snapshot_id": "00000000-0000-4000-8000-000000000010",
+          "protocol_id": "deskdrop-temporal-v1",
+          "as_of_at": "2017-02-01T00:00:00Z",
+          "request_time": "2026-10-19T09:00:00Z"
+        },
+        "quality": {
+          "snapshot_id": "00000000-0000-4000-8000-000000000010",
+          "metadata_version_id": "00000000-0000-4000-8000-000000000021",
+          "status": "unavailable",
+          "reason": "not_run",
+          "quality_run_id": null,
+          "checks_version": null,
+          "dimensions": null,
+          "overall_score": null,
+          "warnings": []
+        }
+      }
+    },
+    {
+      "name": "quality_partial",
+      "operation_id": "quality_detail",
+      "http_status": 200,
+      "body": {
+        "context": {
+          "contract_version": "cmdl-api-v1",
+          "request_id": "00000000-0000-4000-8000-000000000001",
+          "snapshot_id": "00000000-0000-4000-8000-000000000010",
+          "protocol_id": "deskdrop-temporal-v1",
+          "as_of_at": "2017-02-01T00:00:00Z",
+          "request_time": "2026-10-19T09:00:00Z"
+        },
+        "quality": {
+          "snapshot_id": "00000000-0000-4000-8000-000000000010",
+          "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+          "status": "available",
+          "quality_run_id": "00000000-0000-4000-8000-000000000031",
+          "checks_version": "illustrative-partial-checks-v1",
+          "dimensions": {
+            "completeness": {
+              "score": 1.0,
+              "assessed_checks": 4,
+              "passed_checks": 4,
+              "unassessed_checks": 0
+            },
+            "validity": {
+              "score": 1.0,
+              "assessed_checks": 2,
+              "passed_checks": 2,
+              "unassessed_checks": 0
+            },
+            "consistency": {
+              "score": null,
+              "assessed_checks": 0,
+              "passed_checks": 0,
+              "unassessed_checks": 1
+            },
+            "informativeness": {
+              "score": 0.5,
+              "assessed_checks": 2,
+              "passed_checks": 1,
+              "unassessed_checks": 0
+            }
+          },
+          "overall_score": null,
+          "warnings": [
+            {
+              "warning_id": "00000000-0000-4000-8000-000000000041",
+              "check_id": "text_informativeness",
+              "field": "text",
+              "dimension": "informativeness",
+              "severity": "warning",
+              "reason": "Illustrative short-text signal; not a measured finding.",
+              "reviews": []
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "quality_review_history",
+      "operation_id": "quality_detail",
+      "http_status": 200,
+      "body": {
+        "context": {
+          "contract_version": "cmdl-api-v1",
+          "request_id": "00000000-0000-4000-8000-000000000001",
+          "snapshot_id": "00000000-0000-4000-8000-000000000010",
+          "protocol_id": "deskdrop-temporal-v1",
+          "as_of_at": "2017-02-01T00:00:00Z",
+          "request_time": "2026-10-19T09:00:00Z"
+        },
+        "quality": {
+          "snapshot_id": "00000000-0000-4000-8000-000000000010",
+          "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+          "status": "available",
+          "quality_run_id": "00000000-0000-4000-8000-000000000030",
+          "checks_version": "illustrative-checks-v1",
+          "dimensions": {
+            "completeness": {
+              "score": 1.0,
+              "assessed_checks": 4,
+              "passed_checks": 4,
+              "unassessed_checks": 0
+            },
+            "validity": {
+              "score": 1.0,
+              "assessed_checks": 2,
+              "passed_checks": 2,
+              "unassessed_checks": 0
+            },
+            "consistency": {
+              "score": 0.5,
+              "assessed_checks": 2,
+              "passed_checks": 1,
+              "unassessed_checks": 0
+            },
+            "informativeness": {
+              "score": 0.5,
+              "assessed_checks": 2,
+              "passed_checks": 1,
+              "unassessed_checks": 0
+            }
+          },
+          "overall_score": 0.75,
+          "warnings": [
+            {
+              "warning_id": "00000000-0000-4000-8000-000000000040",
+              "check_id": "language_consistency",
+              "field": "lang",
+              "dimension": "consistency",
+              "severity": "warning",
+              "reason": "Illustrative mismatch signal; actual language rules are T16.",
+              "reviews": [
+                {
+                  "client_request_id": "00000000-0000-4000-8000-000000000070",
+                  "snapshot_id": "00000000-0000-4000-8000-000000000010",
+                  "quality_run_id": "00000000-0000-4000-8000-000000000030",
+                  "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+                  "reviewer_label": "reviewer-a",
+                  "decision": "confirm",
+                  "comment": null,
+                  "review_id": "00000000-0000-4000-8000-000000000071",
+                  "warning_id": "00000000-0000-4000-8000-000000000040",
+                  "created_at": "2026-10-19T09:01:00Z"
+                }
+              ]
+            },
+            {
+              "warning_id": "00000000-0000-4000-8000-000000000041",
+              "check_id": "text_informativeness",
+              "field": "text",
+              "dimension": "informativeness",
+              "severity": "warning",
+              "reason": "Illustrative short-text signal; not a measured finding.",
+              "reviews": []
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "quality_report_partial_coverage",
+      "operation_id": "quality_report",
+      "http_status": 200,
+      "body": {
+        "context": {
+          "contract_version": "cmdl-api-v1",
+          "request_id": "00000000-0000-4000-8000-000000000001",
+          "snapshot_id": "00000000-0000-4000-8000-000000000010",
+          "protocol_id": "deskdrop-temporal-v1",
+          "as_of_at": "2017-02-01T00:00:00Z",
+          "request_time": "2026-10-19T09:00:00Z"
+        },
+        "status": "available",
+        "quality_run_id": "00000000-0000-4000-8000-000000000030",
+        "checks_version": "illustrative-checks-v1",
+        "reason": null,
+        "catalog_records": 3,
+        "assessed_records": 1,
+        "unassessed_records": 2,
+        "dimension_means": {
+          "completeness": 1.0,
+          "validity": 1.0,
+          "consistency": 0.5,
+          "informativeness": 0.5
+        },
+        "dimension_denominators": {
+          "completeness": 1,
+          "validity": 1,
+          "consistency": 1,
+          "informativeness": 1
+        },
+        "warning_count": 2,
+        "review_decision_counts": {
+          "confirm": 1,
+          "reject": 0
+        }
+      }
+    },
+    {
+      "name": "quality_report_no_run",
+      "operation_id": "quality_report",
+      "http_status": 200,
+      "body": {
+        "context": {
+          "contract_version": "cmdl-api-v1",
+          "request_id": "00000000-0000-4000-8000-000000000001",
+          "snapshot_id": "00000000-0000-4000-8000-000000000010",
+          "protocol_id": "deskdrop-temporal-v1",
+          "as_of_at": "2017-02-01T00:00:00Z",
+          "request_time": "2026-10-19T09:00:00Z"
+        },
+        "status": "unavailable",
+        "quality_run_id": null,
+        "checks_version": null,
+        "reason": "not_run",
+        "catalog_records": 3,
+        "assessed_records": 0,
+        "unassessed_records": 3,
+        "dimension_means": {
+          "completeness": null,
+          "validity": null,
+          "consistency": null,
+          "informativeness": null
+        },
+        "dimension_denominators": {
+          "completeness": 0,
+          "validity": 0,
+          "consistency": 0,
+          "informativeness": 0
+        },
+        "warning_count": 0,
+        "review_decision_counts": {
+          "confirm": 0,
+          "reject": 0
+        }
+      }
+    },
+    {
+      "name": "review_created",
+      "operation_id": "submit_review",
+      "http_status": 201,
+      "body": {
+        "client_request_id": "00000000-0000-4000-8000-000000000070",
+        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+        "quality_run_id": "00000000-0000-4000-8000-000000000030",
+        "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+        "reviewer_label": "reviewer-a",
+        "decision": "confirm",
+        "comment": null,
+        "review_id": "00000000-0000-4000-8000-000000000071",
+        "warning_id": "00000000-0000-4000-8000-000000000040",
+        "created_at": "2026-10-19T09:01:00Z"
+      },
+      "request": {
+        "client_request_id": "00000000-0000-4000-8000-000000000070",
+        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+        "quality_run_id": "00000000-0000-4000-8000-000000000030",
+        "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+        "reviewer_label": "reviewer-a",
+        "decision": "confirm",
+        "comment": null
+      }
+    },
+    {
+      "name": "review_replayed",
+      "operation_id": "submit_review",
+      "http_status": 200,
+      "body": {
+        "client_request_id": "00000000-0000-4000-8000-000000000070",
+        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+        "quality_run_id": "00000000-0000-4000-8000-000000000030",
+        "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+        "reviewer_label": "reviewer-a",
+        "decision": "confirm",
+        "comment": null,
+        "review_id": "00000000-0000-4000-8000-000000000071",
+        "warning_id": "00000000-0000-4000-8000-000000000040",
+        "created_at": "2026-10-19T09:01:00Z"
+      },
+      "request": {
+        "client_request_id": "00000000-0000-4000-8000-000000000070",
+        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+        "quality_run_id": "00000000-0000-4000-8000-000000000030",
+        "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+        "reviewer_label": "reviewer-a",
+        "decision": "confirm",
+        "comment": null
+      }
+    },
+    {
+      "name": "version_conflict",
+      "operation_id": "submit_review",
+      "http_status": 409,
+      "body": {
+        "request_id": "00000000-0000-4000-8000-000000000001",
+        "code": "VersionMismatch",
+        "message": "Warning does not belong to the supplied metadata/run/snapshot tuple.",
+        "retryable": false,
+        "issues": []
+      },
+      "request": {
+        "client_request_id": "00000000-0000-4000-8000-000000000070",
+        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+        "quality_run_id": "00000000-0000-4000-8000-000000000030",
+        "metadata_version_id": "00000000-0000-4000-8000-000000000021",
+        "reviewer_label": "reviewer-a",
+        "decision": "confirm",
+        "comment": null
+      }
+    },
+    {
+      "name": "idempotency_conflict",
+      "operation_id": "submit_review",
+      "http_status": 409,
+      "body": {
+        "request_id": "00000000-0000-4000-8000-000000000001",
+        "code": "IdempotencyConflict",
+        "message": "Request key already used with a different payload.",
+        "retryable": false,
+        "issues": []
+      },
+      "request": {
+        "client_request_id": "00000000-0000-4000-8000-000000000070",
+        "snapshot_id": "00000000-0000-4000-8000-000000000010",
+        "quality_run_id": "00000000-0000-4000-8000-000000000030",
+        "metadata_version_id": "00000000-0000-4000-8000-000000000020",
+        "reviewer_label": "reviewer-a",
+        "decision": "reject",
+        "comment": null
+      }
+    },
+    {
+      "name": "invalid_limit",
+      "operation_id": "recommend",
+      "http_status": 422,
+      "body": {
+        "request_id": "00000000-0000-4000-8000-000000000001",
+        "code": "InvalidInput",
+        "message": "limit must be between 1 and 10.",
+        "retryable": false,
+        "issues": [
+          {
+            "field": "query.limit",
+            "message": "Expected integer in [1, 10]."
+          }
+        ]
+      }
+    },
+    {
+      "name": "unknown_article",
+      "operation_id": "article",
+      "http_status": 404,
+      "body": {
+        "request_id": "00000000-0000-4000-8000-000000000001",
+        "code": "UnknownArticle",
+        "message": "Article identity was not found.",
+        "retryable": false,
+        "issues": []
+      }
+    },
+    {
+      "name": "dependency_failure",
+      "operation_id": "recommend",
+      "http_status": 503,
+      "body": {
+        "request_id": "00000000-0000-4000-8000-000000000001",
+        "code": "DependencyUnavailable",
+        "message": "Required snapshot or ranking artifacts are unavailable.",
+        "retryable": true,
+        "issues": []
+      }
+    },
+    {
+      "name": "readiness_failure",
+      "operation_id": "readiness",
+      "http_status": 503,
+      "body": {
+        "request_id": "00000000-0000-4000-8000-000000000001",
+        "code": "DependencyUnavailable",
+        "message": "Required database is unavailable.",
+        "retryable": true,
+        "issues": []
+      }
+    }
+  ]
+}
