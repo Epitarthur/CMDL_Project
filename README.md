@@ -1,10 +1,27 @@
-# CMDL_Project
+# CMDL Project
 
-Plan: Music Player with a Metadata-Quality-Aware Recommender
-1. Core idea
+Deskdrop article recommendation with metadata quality evaluation.
 
-The two topics are linked: recommendation quality depends on metadata quality, and recommendations can reveal metadata problems. So the system has three parts:
+## Current state
 
-Music player and catalog: browse, play, search, log listening events.
-Metadata Quality Evaluation (MQE) framework: scores every track and flags problems.
-Recommender: suggests tracks and uses the quality scores to decide how much to trust each track's metadata.
+Planning documents, original datasets and empty scaffolding only. No application,
+models, database migrations or runnable Docker services have been implemented.
+
+## Planned stack
+
+Python, PostgreSQL, FastAPI, Streamlit and Docker Compose. The complete demo should
+run on a teammate’s laptop. Preparation and training run as explicit batch jobs.
+
+## Start here
+
+- [Architecture and repository layout](docs/architecture.md)
+- [Shared contracts](docs/contracts.md)
+- [Evaluation plan](docs/evaluation.md)
+- [Team ownership and delivery sequence](docs/delivery.md)
+- [Decisions and open questions](docs/decisions.md)
+- [Dataset provenance](data/raw/manifest.json)
+
+Original CSVs are tracked under `data/raw/`. Derived data, models and rankings are
+local outputs and are excluded from Git. Keep original source files unchanged.
+
+This repository replaces the earlier music-player proposal.

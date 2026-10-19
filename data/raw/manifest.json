@@ -1,0 +1,17 @@
+{
+  "source": "CI&T Deskdrop \u2014 Articles sharing and reading",
+  "source_url": "https://www.kaggle.com/datasets/gspmoreira/articles-sharing-reading-from-cit-deskdrop",
+  "note": "Files supplied by Florian. Dataset version, redistribution terms and slide counts have not yet been independently verified. Preserve original bytes.",
+  "files": [
+    {
+      "file": "shared_articles.csv",
+      "bytes": 17994417,
+      "sha256": "5d006115986794aa16b29d77e025c1b456c9ed74f8b897da48bb3d2335f16e3a"
+    },
+    {
+      "file": "users_interactions.csv",
+      "bytes": 11948038,
+      "sha256": "41e39ec53570c18aad1eb347eb3225237d58665811b5d23fa3d24cc81ea7862f"
+    }
+  ]
+}
