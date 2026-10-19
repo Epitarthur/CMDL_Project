@@ -1,6 +1,6 @@
 # Project TODO and implementation tickets
 
-Status: T01–T03 completed on 2026-10-19 following Florian’s explicit approval and closure instruction. Benchmark v1 is frozen, publisher version/license and current slide counts are verified, and tooling/CI pass. T04’s schema and API contract are approved and complete; T05’s Docker environment is implemented and locally verified; T06 onward remain planned.
+Status: T01–T03 completed on 2026-10-19 following Florian’s explicit approval and closure instruction. Benchmark v1 is frozen, publisher version/license and current slide counts are verified, and tooling/CI pass. T04’s schema and API contract are approved and complete; T05’s Docker environment is implemented and locally verified; T06 migrations and database guards are implemented and verified; T07 onward remain planned.
 
 Tickets are local planning records, not GitHub Issues. Owners are defaults. Dependencies use ticket numbers; work within a phase may proceed in parallel when dependencies permit. Update status and link implementation commits/PRs and evidence as work completes.
 
@@ -76,7 +76,7 @@ teammate laptop run is not claimed. See [environment guide](docs/compose.md).
 
 ## Data and reproducibility
 
-### [ ] T06 — Implement database migrations
+### [x] T06 — Implement database migrations
 
 **Owner:** Florian  
 **Depends on:** T04, T05
@@ -84,6 +84,14 @@ teammate laptop run is not claimed. See [environment guide](docs/compose.md).
 **Implement / produce:** Create users, articles, article events, interactions, snapshots, metadata versions, quality runs/warnings, review decisions, model runs and rankings with foreign keys and indexes. Preserve source provenance.
 
 **Validate / acceptance:** Migrations work on an empty database; invalid references are rejected; original versions survive later versions; timestamps and string identifiers round-trip.
+
+**Evidence (2026-10-19):** 20 application tables plus a checksummed migration ledger,
+composite foreign keys, indexes and transactional publication/history guards are
+implemented. 49 real PostgreSQL checks pass; full suite 115 passed. The runtime image
+passed initial/repeated migration, persistence and reset/reinstallation checks.
+Migration applied to the local development database; no raw ingestion performed.
+See [migration guide](docs/migrations.md) and [validation](docs/development.md).
+
 
 ### [ ] T07 — Build idempotent CSV ingestion
 

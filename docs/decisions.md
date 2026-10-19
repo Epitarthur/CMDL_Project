@@ -78,3 +78,17 @@ good, we will update it later if needed"). With the earlier storage approval, T0
 is complete. Later contract changes are permitted with versioned specifications,
 examples and affected-consumer updates, followed by validation. No separate
 contributor approvals are inferred. T05 can use these approved contracts.
+
+
+## T06 storage implementation (2026-10-19)
+
+Use packaged PostgreSQL SQL migrations and a small transactional runner rather than
+introducing an ORM. `schema_migrations` records SQL checksums, and an advisory lock
+serializes concurrent runners. Applied files are immutable; future changes add a new
+numbered migration. Publication and append-only rules are database-enforced.
+
+`source_files.event_category` and `ranking_sets.status` make the approved category
+and publication boundaries enforceable. The concrete manifest/coverage/branch JSON
+formats are recorded in `migrations.md`; these additive implementation details do
+not change benchmark v1 or API payloads. T07 ingestion, T08 snapshot preparation,
+T18 replay response handling and T21 product serving remain their own tickets.

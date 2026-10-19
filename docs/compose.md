@@ -30,8 +30,8 @@ healthy API. The development screen additionally verifies the UI → API → SQL
 
 `GET /ready` returns the approved `DependencyUnavailable` error with HTTP 503 even
 when infrastructure is healthy: no published snapshot or ranking artifacts exist yet.
-It also returns 503 on database failure. This is expected at T05. Migrations are T06,
-product endpoints/readiness verification T21 and reader/reviewer screens T22/T23.
+It also returns 503 on database failure. T06 provides [explicit migrations](migrations.md);
+product endpoints/readiness verification are T21 and reader/reviewer screens T22/T23.
 `/health` is an internal development endpoint outside the product API contract.
 The generated FastAPI docs describe only this bootstrap; the complete target contract
 remains `docs/api/openapi.json`. No model data is fabricated during service startup.
@@ -44,8 +44,17 @@ docker compose --profile jobs run --rm --user "$(id -u):$(id -g)" job cmdl profi
 
 This verifies the original CSVs and writes JSON/Markdown to host `artifacts/data-profile/`.
 Raw inputs are mounted read-only. The job exits after completion and does not depend
-on running services. Outputs are ignored by Git. The explicit user option writes outputs as your host user on Linux and macOS.
-The service image otherwise defaults to unprivileged UID 10001. Ingestion/training commands will be added with their
+on running services. Outputs are ignored by Git. The explicit user option writes outputs
+as your host user on Linux and macOS. The service image otherwise defaults to
+unprivileged UID 10001.
+
+Apply the schema after starting the database:
+
+```sh
+docker compose --profile jobs run --rm job cmdl migrate
+```
+
+See [migration behavior and future changes](migrations.md). Ingestion/training commands will be added with their
 tickets; they are not scheduled or run automatically at startup.
 
 ## Stop, persistence and reset
@@ -64,6 +73,7 @@ To **delete this project's database contents** and initialize an empty database:
 ```sh
 docker compose down --volumes
 docker compose up -d --wait
+docker compose --profile jobs run --rm job cmdl migrate
 ```
 
 This does not remove raw CSVs or host batch artifacts. To regenerate a profile, rerun
@@ -83,7 +93,8 @@ uv run python scripts/smoke_compose.py
 The smoke command builds and starts a uniquely named temporary project on temporary
 localhost ports. It runs the actual Streamlit script against the API, checks honest
 503 readiness, writes a probe row, verifies it survives DB restart and Compose
-recreation, then verifies `down --volumes` produces an empty database. It always
+recreation, then verifies `down --volumes` produces an empty database. It also checks
+initial/repeated migration, ledger persistence and reinstallation after reset. It always
 cleans up only its own project and volume. It requires the dev environment installed
 with `uv sync --locked`. It does not touch the normal `cmdl` development volume.
 Docker builds require network access on the first run. If interrupted by a process

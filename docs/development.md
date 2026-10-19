@@ -105,3 +105,26 @@ to the host artifacts directory. Original tracked data remains unchanged.
 The smoke test is now part of the GitHub workflow. Local evidence uses Docker on
 Florian’s machine; it does not claim a manual run on another teammate’s laptop.
 See [Compose commands and reset semantics](compose.md).
+
+
+## T06 migration validation — 2026-10-19
+
+The full suite passes 115 tests, including 49 real PostgreSQL integration checks.
+Checks cover first/repeated migration, concurrent migrators, checksum/history drift,
+transactional DDL rollback, exact signed source IDs above JavaScript's safe integer
+range, UTC offset round-trip, retained raw duplicates, category isolation, metadata
+share/base/version links, no future metadata, incomplete publication rejection,
+same-second/removal/re-share states, quality coverage/null semantics, immutable
+history, review disagreement/idempotency-key uniqueness, feature/run/snapshot joins,
+hybrid dependencies and finite/deterministic/unique prepared rankings.
+
+The Docker smoke check passes migration from the installed runtime image, repeat
+no-op, ledger persistence after database/container recreation and reinstallation
+after an explicit temporary-volume reset. The normal development stack was rebuilt;
+`cmdl migrate` applied `0001_storage_v1.sql` and a second run reported up to date.
+Original CSVs and their manifest remain unchanged. No source data has been ingested
+into the development database and product readiness still returns 503.
+
+CI now supplies a PostgreSQL service and `CMDL_TEST_DSN` so database tests run rather
+than skip. Without that variable, local runs skip those 49 tests. See
+[migration commands and implementation details](migrations.md).

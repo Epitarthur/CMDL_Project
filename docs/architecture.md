@@ -21,13 +21,13 @@ and returns results. Streamlit displays reader and reviewer views.
 - `src/cmdl/api/`: service contracts and endpoints.
 - `src/cmdl/ui/`: Streamlit reader and reviewer screens.
 - `configs/`: future versioned data, model, quality and experiment configuration.
-- `migrations/`: future database migrations.
+- `src/cmdl/db/`: migration runner and packaged, versioned SQL migrations.
 - `tests/`: unit and integration checks.
 - `notebooks/`: exploratory work that reuses shared modules.
 - `data/raw/`: unchanged tracked source files and checksums.
 - `data/processed/`, `artifacts/`: generated local outputs, excluded from Git.
 
-## Planned storage
+## Storage
 
 Users, article identities, article events, interactions, metadata versions, quality
 runs, field warnings, review decisions, model runs and prepared rankings. Preserve
@@ -36,6 +36,7 @@ source duplicate handling. Do not infer publication dates from sharing timestamp
 
 The entity/key/version design is specified in [database contract v1](database-schema.md),
 with [API contracts and examples](contracts.md). T04’s artifacts were approved by Florian
-on 2026-10-19. Executable migrations are T06 and service implementation is T21.
+on 2026-10-19. T06 implements the schema with [versioned migrations](migrations.md)
+and transactional publication guards. Service implementation is T21.
 The T05 [development environment](compose.md) adds infrastructure and connectivity checks.
 Product data services remain for their implementation tickets.

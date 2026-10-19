@@ -1,8 +1,8 @@
 # Database contract v1
 
-Contract ID: `cmdl-storage-v1`. Design for PostgreSQL; migrations are T06, ingestion
-T07 and snapshots T08. This document specifies the constraints those implementations
-must enforce. It does not claim tables have been created. Benchmark semantics are
+Contract ID: `cmdl-storage-v1`. Implemented for PostgreSQL by the T06
+[migration and publication guards](migrations.md). Ingestion is T07 and snapshots T08.
+This document specifies the constraints those implementations must enforce. Benchmark semantics are
 [`deskdrop-temporal-v1`](benchmark-proposal.md).
 
 Approved by Florian on 2026-10-19 following review of this schema. This freezes
@@ -27,7 +27,7 @@ for referenced rows; published snapshots, versions and completed runs are immuta
 
 | Table | Primary key | Required columns and links | Other constraints |
 | --- | --- | --- | --- |
-| source_files | sha256 | filename, bytes, dataset_ref, upstream_version, imported_at | bytes >= 0; sha256 identifies bytes, not filename |
+| source_files | sha256 | filename, bytes, dataset_ref, upstream_version, event_category, imported_at | bytes >= 0; sha256 identifies bytes, not filename; event_category article/interaction |
 | source_rows | (file_sha256, row_number) | FK source_files, raw_fields JSONB, duplicate_file_sha256?, duplicate_row_number? | row_number >= 1; raw_fields retains original CSV strings; duplicate pair both null or both set |
 | users | person_id | created_at | Union of observed interacting users and article authors; API user count distinguishes those populations |
 | articles | content_id | created_at | Identity only; no mutable title/text columns |
@@ -108,7 +108,7 @@ provenance in this local demo, never authentication or authorization.
 | feature_sets | feature_set_id | snapshot_id FK, feature_version, artifact_uri, artifact_sha256, config JSONB, fitted_before_at, created_at | References a local artifact; no blobs in Git |
 | feature_items | (feature_set_id, content_id) | metadata_version_id, snapshot_id | Composite version/content and snapshot membership FKs |
 | model_runs | model_run_id | snapshot_id FK, protocol_id, model_type, feature_set_id?, quality_run_id?, status, manifest JSONB, artifact_uri?, created_at | model_type popularity/tfidf/als/fixed_hybrid/semantic/quality_hybrid |
-| ranking_sets | ranking_set_id | snapshot_id FK, model_run_id FK, kind user/similar, created_at | Model snapshot must equal ranking snapshot |
+| ranking_sets | ranking_set_id | snapshot_id FK, model_run_id FK, kind user/similar, status building/published/failed, created_at | Model snapshot must equal ranking snapshot |
 | prepared_rankings | ranking_entry_id | ranking_set_id FK, snapshot_id, person_id?, reference_content_id?, content_id, metadata_version_id, rank, score, explanation_code | Exactly one subject type; finite score; rank 1..50 |
 
 Model status is pending/running/completed/failed. Only completed runs may be selected
@@ -171,3 +171,9 @@ transactional; readers never observe half-published outputs. More than one run m
 exist; API selection uses explicitly configured active run IDs, not an arbitrary
 MAX(timestamp) from potentially incompatible runs. Readiness fails when those IDs
 cannot be resolved consistently.
+
+
+T06 makes two publication details explicit on 2026-10-19: file event category and
+ranking-set status. These additive columns enforce the existing category/publication
+rules; benchmark and API semantics are unchanged. Exact JSON encodings, transition
+rules and validation evidence are documented in [migrations](migrations.md).

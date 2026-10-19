@@ -56,6 +56,11 @@ services:
     <<: *app
     profiles: [jobs]
     command: [cmdl, profile]
+    environment:
+      PGHOST: db
+      PGDATABASE: ${POSTGRES_DB:-cmdl}
+      PGUSER: ${POSTGRES_USER:-cmdl}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-cmdl-local-development}
     volumes:
       - ./data/raw:/app/data/raw:ro
       - ./artifacts:/app/artifacts

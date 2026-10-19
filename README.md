@@ -6,16 +6,17 @@ Deskdrop article recommendation with metadata quality evaluation.
 
 Python package, locked development tooling, CI workflow and a tested source-data
 profiler are implemented. Docker Compose now provides PostgreSQL, a FastAPI
-bootstrap and a Streamlit development status screen. Models, database migrations
-and product API/UI features remain planned. T01–T03 are complete: benchmark v1 is approved,
+bootstrap and a Streamlit development status screen. PostgreSQL migrations
+implement the approved storage schema. Models and product API/UI features remain planned. T01–T03 are complete: benchmark v1 is approved,
 dataset version/license and presentation counts are verified, and CI has passed.
-T04’s database schema and API contract are approved. T01–T05 are complete; the environment has passed local Docker verification.
+T04’s database schema and API contract are approved. T01–T06 are complete; the environment and migrations have passed local Docker verification.
 
 ## Local services
 
 ```sh
 cp .env.example .env
 docker compose up --build -d --wait
+docker compose --profile jobs run --rm job cmdl migrate
 ```
 
 Open [Streamlit](http://localhost:8501). See [startup, jobs, persistence and reset](docs/compose.md).
@@ -32,7 +33,7 @@ run on a teammate’s laptop. Preparation and training run as explicit batch job
 
 - [Architecture and repository layout](docs/architecture.md)
 - [Shared API contract](docs/contracts.md)
-- [Database schema specification](docs/database-schema.md)
+- [Database schema specification](docs/database-schema.md) and [migration commands](docs/migrations.md)
 - [OpenAPI document](docs/api/openapi.json) and [illustrative examples](docs/api/examples.json)
 - [Evaluation plan](docs/evaluation.md)
 - [Team ownership and delivery sequence](docs/delivery.md)
