@@ -29,8 +29,9 @@ and Streamlit using `/_stcore/health`. API waits for healthy PostgreSQL; UI wait
 healthy API. The development screen additionally verifies the UI → API → SQL path.
 
 `GET /ready` returns the approved `DependencyUnavailable` error with HTTP 503 even
-when infrastructure is healthy: no published snapshot or ranking artifacts exist yet.
-It also returns 503 on database failure. T06 provides [explicit migrations](migrations.md);
+when infrastructure is healthy: recommendation artifacts and product serving are
+still pending. Migration, ingestion and snapshot publication alone do not make
+serving ready. It also returns 503 on database failure. T06 provides [explicit migrations](migrations.md);
 product endpoints/readiness verification are T21 and reader/reviewer screens T22/T23.
 `/health` is an internal development endpoint outside the product API contract.
 The generated FastAPI docs describe only this bootstrap; the complete target contract
@@ -61,7 +62,15 @@ docker compose --profile jobs run --rm --user "$(id -u):$(id -g)" job cmdl inges
 ```
 
 See [source preservation, replay and exclusion audit](ingestion.md). Training commands
-will arrive with their tickets. No batch command runs automatically at startup.
+will arrive with their tickets. Publish both request-time snapshots explicitly:
+
+```sh
+docker compose --profile jobs run --rm --user "$(id -u):$(id -g)" job cmdl snapshot \
+  --import-id 8a46c7b5-ce33-590f-acf7-e2d4a9198313
+```
+
+Use your actual completed import ID. See [snapshot semantics and model inputs](snapshots.md).
+No batch command runs automatically at startup.
 
 ## Stop, persistence and reset
 
@@ -100,8 +109,8 @@ The smoke command builds and starts a uniquely named temporary project on tempor
 localhost ports. It runs the actual Streamlit script against the API, checks honest
 503 readiness, writes a probe row, verifies it survives DB restart and Compose
 recreation, then verifies `down --volumes` produces an empty database. It also checks
-initial/repeated migration, real-source import/replay, ledger persistence and
-reinstallation after reset. It always
+initial/repeated migration, real-source import/replay, snapshot publication/replay,
+ledger/membership persistence and reinstallation after reset. It always
 cleans up only its own project and volume. It requires the dev environment installed
 with `uv sync --locked`. It does not touch the normal `cmdl` development volume.
 Docker builds require network access on the first run. If interrupted by a process

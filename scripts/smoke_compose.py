@@ -78,6 +78,34 @@ def main() -> None:
         ).startswith("Already imported:")
         assert sql("SELECT count(*) FROM source_rows") == "75434"
         assert sql("SELECT count(*) FROM source_imports") == "1"
+        import_id = sql("SELECT import_id FROM source_imports")
+        assert compose(
+            "--profile",
+            "jobs",
+            "run",
+            "--rm",
+            "job",
+            "cmdl",
+            "snapshot",
+            "--import-id",
+            import_id,
+            "--output-dir",
+            "/tmp/cmdl-snapshots-smoke",
+        ).startswith("Published benchmark snapshots.")
+        assert compose(
+            "--profile",
+            "jobs",
+            "run",
+            "--rm",
+            "job",
+            "cmdl",
+            "snapshot",
+            "--import-id",
+            import_id,
+            "--output-dir",
+            "/tmp/cmdl-snapshots-smoke",
+        ).startswith("Already published benchmark snapshots.")
+        assert sql("SELECT count(*) FROM snapshots WHERE status='published'") == "2"
         with httpx.Client(timeout=10) as client:
             response = client.get(f"http://127.0.0.1:{env['API_PORT']}/health")
             response.raise_for_status()
@@ -116,6 +144,7 @@ def main() -> None:
         assert sql("SELECT value FROM t05_probe") == "persisted"
         assert sql("SELECT count(*) FROM schema_migrations") == "2"
         assert sql("SELECT count(*) FROM source_imports") == "1"
+        assert sql("SELECT count(*) FROM snapshots WHERE status='published'") == "2"
         compose("down", "--volumes")
         up()
         assert sql("SELECT to_regclass('public.t05_probe') IS NULL") == "t"
@@ -124,7 +153,8 @@ def main() -> None:
             "--profile", "jobs", "run", "--rm", "job", "cmdl", "migrate"
         )
         assert sql("SELECT count(*) FROM source_imports") == "0"
-        print("PASS: UI → API → DB, migrations, import/replay, persistence and volume reset")
+        assert sql("SELECT count(*) FROM snapshots") == "0"
+        print("PASS: UI → API → DB, migrations, import/snapshot replay, persistence and reset")
     except Exception:
         print(compose("logs", "--tail=100", "db", "api", "ui"))
         raise

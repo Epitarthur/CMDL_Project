@@ -1,6 +1,6 @@
 # Project TODO and implementation tickets
 
-Status: T01–T03 completed on 2026-10-19 following Florian’s explicit approval and closure instruction. Benchmark v1 is frozen, publisher version/license and current slide counts are verified, and tooling/CI pass. T04’s schema and API contract are approved and complete; T05’s Docker environment is implemented and locally verified; T06 migrations and database guards are implemented and verified; T07 ingestion and its exclusion audit are implemented and verified; T08 onward remain planned.
+Status: T01–T03 completed on 2026-10-19 following Florian’s explicit approval and closure instruction. Benchmark v1 is frozen, publisher version/license and current slide counts are verified, and tooling/CI pass. T04’s schema and API contract are approved and complete; T05’s Docker environment is implemented and locally verified; T06 migrations and database guards are implemented and verified; T07 ingestion and its exclusion audit are implemented and verified; T08 published snapshots and temporal inputs are implemented and verified; T09 onward remain planned.
 
 Tickets are local planning records, not GitHub Issues. Owners are defaults. Dependencies use ticket numbers; work within a phase may proceed in parallel when dependencies permit. Update status and link implementation commits/PRs and evidence as work completes.
 
@@ -111,7 +111,7 @@ exclusions and 72,135 canonical eligible rows before cutoff/history filters.
 See [ingestion guide](docs/ingestion.md) and [validation](docs/development.md).
 
 
-### [ ] T08 — Publish snapshots and temporal eligibility
+### [x] T08 — Publish snapshots and temporal eligibility
 
 **Owner:** Florian + Arthur  
 **Depends on:** T07
@@ -119,6 +119,15 @@ See [ingestion guide](docs/ingestion.md) and [validation](docs/development.md).
 **Implement / produce:** Create reproducible snapshots, metadata-as-of lookup, availability and previously consumed filtering. Implement shared candidate policy and train/validation/test partitions.
 
 **Validate / acceptance:** Boundary tests cover events at cutoffs, removals, re-shares, unseen items and metadata versions; no model receives future histories or a different candidate policy.
+
+**Evidence (2026-10-19):** Atomic, deterministic validation/test snapshots published
+and replayed in the development database. Shared frozen model views enforce earlier
+metadata/history, fixed catalogs and prior-consumption filtering. Half-open raw
+splits reconcile to 66,508 / 2,895 / 2,909 events. Catalogs contain 2,788 / 2,902
+available items; canonical fitting histories contain 66,332 / 69,226 events.
+Snapshot/variant/holdout checks and Docker publication/persistence/reset pass.
+See [snapshot guide](docs/snapshots.md) and [validation](docs/development.md).
+
 
 ### [ ] T09 — Implement run manifests and artifact tracking
 

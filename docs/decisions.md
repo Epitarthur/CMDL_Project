@@ -106,3 +106,24 @@ be regenerated from the committed audit after filesystem failure.
 The source audit partitions interactions before snapshot/cutoff/history filters;
 it does not publish an evaluation population. Benchmark v1 and API semantics are
 unchanged. See `ingestion.md` and the current evidence in `development.md`.
+
+
+## T08 snapshot publication and shared model inputs (2026-10-19)
+
+Publish January 1 validation and February 1 test request snapshots atomically with
+stable identities, explicit source/metadata lineage and database publication guards.
+All models consume one frozen loader/candidate/history interface; holdout diagnostics
+are separate evaluation-only exports. All strictly earlier observed interactions
+mark consumption, while modeling history separately rejects duplicates and lifecycle
+anomalies. Historical metadata is selected before each interaction, not recovered
+from a later request-time version. Variant experiments preserve candidate eligibility.
+
+Equivalent same-second share payloads choose the earliest canonical source row;
+distinct descriptive payloads with unknown order fail preparation explicitly. This
+does not invent subsecond order or silently alter the benchmark. The original source
+has one share per shared content ID. Snapshot identities pin concrete pre-cutoff
+metadata IDs/payload checksums, so future variant rows cannot alter a past snapshot ID.
+
+The fixed catalog leaves 202 / 254 validation/test positive pairs before cohort
+filters. These measured denominators are disclosed; they did not trigger any change
+to the approved benchmark. See `snapshots.md` for exact populations and commands.

@@ -46,4 +46,6 @@ def health():
 def ready():
     if not database_available():
         return unavailable("Required database is unavailable.")
-    return unavailable("Published snapshot and recommendation artifacts are not available yet.")
+    return unavailable(
+        "Required snapshot and recommendation dependencies are not ready for serving yet."
+    )

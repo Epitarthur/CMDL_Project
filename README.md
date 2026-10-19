@@ -8,9 +8,10 @@ Python package, locked development tooling, CI workflow and a tested source-data
 profiler are implemented. Docker Compose now provides PostgreSQL, a FastAPI
 bootstrap and a Streamlit development status screen. PostgreSQL migrations
 implement the approved storage schema. CSV ingestion preserves source lineage and
-produces a repeatable exclusion audit. Models and product API/UI features remain planned. T01–T03 are complete: benchmark v1 is approved,
+produces a repeatable exclusion audit. Published temporal snapshots supply a shared
+candidate/history policy. Models and product API/UI features remain planned. T01–T03 are complete: benchmark v1 is approved,
 dataset version/license and presentation counts are verified, and CI has passed.
-T04’s database schema and API contract are approved. T01–T07 are complete; ingestion, migrations and the environment pass local verification.
+T04’s database schema and API contract are approved. T01–T08 are complete; published snapshots, ingestion and the environment pass local verification.
 
 ## Local services
 
@@ -21,8 +22,10 @@ docker compose --profile jobs run --rm job cmdl migrate
 docker compose --profile jobs run --rm --user "$(id -u):$(id -g)" job cmdl ingest
 ```
 
+Then [prepare snapshots](docs/snapshots.md) using the completed import UUID.
+
 Open [Streamlit](http://localhost:8501). See [startup, jobs, persistence and reset](docs/compose.md).
-Application readiness returns 503 until later tickets provide snapshots and rankings.
+Recommendation serving remains at 503 until ranking artifacts and product endpoints exist.
 
 ## Stack
 
@@ -37,7 +40,7 @@ run on a teammate’s laptop. Preparation and training run as explicit batch job
 - [Shared API contract](docs/contracts.md)
 - [Database schema specification](docs/database-schema.md) and [migration commands](docs/migrations.md)
 - [OpenAPI document](docs/api/openapi.json) and [illustrative examples](docs/api/examples.json)
-- [Evaluation plan](docs/evaluation.md)
+- [Evaluation plan](docs/evaluation.md) and [snapshot preparation/model inputs](docs/snapshots.md)
 - [Team ownership and delivery sequence](docs/delivery.md)
 - [Decisions and open questions](docs/decisions.md)
 - [Approved benchmark v1](docs/benchmark-proposal.md)

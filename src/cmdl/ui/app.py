@@ -19,10 +19,10 @@ try:
         st.success("Streamlit → API → PostgreSQL connected")
         ready = client.get("/ready")
         if ready.status_code == 503:
-            st.info("Application data is not ready. Snapshots and rankings will be added later.")
+            st.info("Recommendation artifacts are not ready yet.")
         else:
             ready.raise_for_status()
             st.success("Application data is ready")
 except (httpx.HTTPError, ValueError):
     st.error("Could not verify service connectivity. Check the API and database, then refresh.")
-st.caption("T05 environment preview · Reader and reviewer screens are planned in T22/T23.")
+st.caption("Development status · Reader and reviewer screens are planned in T22/T23.")

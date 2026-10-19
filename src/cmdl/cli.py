@@ -3,6 +3,7 @@
 import argparse
 import sys
 from pathlib import Path
+from uuid import UUID
 
 from cmdl.data.profile import ProfileError, profile, write_report
 
@@ -48,6 +49,44 @@ def _ingest_command(args) -> int:
     return 0
 
 
+def _snapshot_command(args) -> int:
+    import psycopg
+
+    from cmdl.data.ingest import IngestError, validate_output, write_failure
+    from cmdl.data.snapshots import prepare_benchmark, write_benchmark_report
+    from cmdl.data.temporal import TemporalError
+
+    try:
+        validate_output(args.output_dir, Path("data/raw"))
+        with psycopg.connect(connect_timeout=5) as connection:
+            report, created = prepare_benchmark(connection, args.import_id, args.variant_id)
+    except (TemporalError, IngestError, psycopg.Error) as exc:
+        message = (
+            f"Database error {exc.sqlstate or 'connection'}; rerun to verify publication."
+            if isinstance(exc, psycopg.Error)
+            else str(exc)
+        )
+        print(f"Snapshot preparation failed: {message}", file=sys.stderr)
+        try:
+            write_failure(args.output_dir, Path("data/raw"), "snapshot", message)
+        except (OSError, IngestError):
+            pass
+        return 1
+    try:
+        write_benchmark_report(report, args.output_dir)
+    except OSError:
+        print(
+            "Snapshots committed but export failed; rerun to regenerate the report.",
+            file=sys.stderr,
+        )
+        return 1
+    print(
+        f"{'Published' if created else 'Already published'} benchmark snapshots. "
+        f"Report: {args.output_dir / 'benchmark.md'}"
+    )
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -57,8 +96,14 @@ def main(argv: list[str] | None = None) -> int:
     importer = commands.add_parser("ingest", help="Validate and transactionally import both CSVs")
     importer.add_argument("--raw-dir", type=Path, default=Path("data/raw"))
     importer.add_argument("--output-dir", type=Path, default=Path("artifacts/source-import"))
+    snapshot = commands.add_parser("snapshot", help="Publish validation/test request snapshots")
+    snapshot.add_argument("--import-id", type=UUID, required=True)
+    snapshot.add_argument("--variant-id", default="original")
+    snapshot.add_argument("--output-dir", type=Path, default=Path("artifacts/snapshots"))
     commands.add_parser("migrate", help="Apply pending PostgreSQL migrations using PG* settings")
     args = parser.parse_args(argv)
+    if args.command == "snapshot":
+        return _snapshot_command(args)
     if args.command == "ingest":
         return _ingest_command(args)
     if args.command == "migrate":

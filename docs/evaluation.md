@@ -19,7 +19,9 @@ The authoritative rules, examples and change-control policy are in
 
 Train before 2017-01-01T00:00:00Z, validate during January, and test during February
 2017. All intervals are half-open. Evaluate one request per user at each holdout's
-start with the same available, unseen candidate policy for every model. Fit features,
+start with the same available, unseen candidate policy for every model.
+T08 implements this through [published snapshots and one shared loader](snapshots.md);
+models use its candidates/history helpers rather than selecting their own raw rows. Fit features,
 models, thresholds and normalization from permitted earlier history only.
 
 Use all five interaction types as consumption/relevance events, approved event

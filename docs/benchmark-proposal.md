@@ -5,7 +5,8 @@ project chat, with explicit authorization to close T01–T03. This records Flori
 approval; it does not claim separate approvals from Arthur or Charly.
 
 This is the agreed contract for subsequent ingestion, snapshots and model evaluation.
-Implementation of those components remains in T07/T08/T10/T15. The filename is kept
+T07/T08 now implement ingestion, snapshots and temporal model inputs.
+Signals and ranking evaluation remain T10/T15. The filename is kept
 stable for existing links. Source findings are in `data-profile.md`.
 
 ## Time periods
@@ -91,6 +92,7 @@ filters, relevance, eligibility or retraining rules change. Pure wording correct
 that do not change behavior may retain the ID and must be noted. Changes influenced
 by observed test results must be disclosed; reserve a fresh holdout where feasible.
 
-These accepted examples become executable snapshot tests in T08. Existing profiler
-tests already cover temporal anomalies and conflicting timestamps; they do not
-constitute a complete snapshot or recommender implementation.
+T08 executes these chronological examples in temporal-policy and real PostgreSQL
+snapshot tests. It publishes fixed request-time catalogs and strictly earlier model
+inputs; recommender training and ranking metrics remain later tickets. See
+[snapshot preparation and shared model inputs](snapshots.md).

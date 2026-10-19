@@ -175,3 +175,29 @@ identities in this source version. Stub behavior is covered by synthetic fixture
 
 No snapshot has been published and product readiness remains 503. Snapshot/fitting
 cutoffs, consumed-item filtering and model preparation remain later tickets.
+
+
+## T08 snapshot validation — 2026-10-19
+
+172 tests pass: the previous 134 plus 24 temporal/model-view checks and 14 real
+snapshot checks. Coverage includes approved chronological examples, exact UTC
+half-open boundaries, current versus historical metadata, missing/conflicting
+versions, payload/config checksums, fixed catalog and consumption policy, variant
+invariance, no future model inputs, timezone normalization, deterministic replay,
+concurrent publication and rollback of both snapshots on failure.
+
+The original files produce 2,788 validation and 2,902 test candidates, with 66,332
+and 69,226 canonical eligible fitting events. Raw split counts reconcile to 66,508
+training + 2,895 validation + 2,909 test = 72,312 interactions. The separate holdout
+audit reports 202 / 254 distinct relevant pairs and 133 / 146 users with eligible
+positives before T10 history/cohort filters. It exposes 2,514 / 2,424 events outside
+the fixed request-time catalogs; no benchmark rules were changed after seeing this.
+Detailed populations and limitations are in [snapshots](snapshots.md).
+
+The packaged Docker command publishes and replays both snapshots. The isolated
+smoke stack confirms published memberships survive recreation and disappear only
+after explicit test-volume reset. Both snapshots were also published/replayed in
+the normal development database; local exports are ignored under
+`artifacts/snapshots/`. Reader/reviewer UI and recommendation artifacts remain later
+tickets, so `/ready` continues to return 503. Raw CSVs, manifest and applied migrations
+are unchanged; no schema migration was needed for T08.
