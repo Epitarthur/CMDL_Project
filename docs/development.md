@@ -46,6 +46,31 @@ database. Generated outputs, local environments, caches and `.env` files are ign
 - `git diff --exit-code -- data/raw` passed: tracked source files and manifest unchanged.
 - `git check-ignore` confirmed reports, `.env`, virtual environment and Ruff cache ignored.
 
-Hosted GitHub Actions has not run in this session; no commit or push was made.
-Team review remains part of T03 acceptance. T02 still needs upstream version/terms
-and slide reconciliation; T01 remains a benchmark proposal awaiting team approval.
+## Hosted verification and ticket closure
+
+Foundation commit [`f0aa8fc`](https://github.com/Epitarthur/CMDL_Project/commit/f0aa8fcaf9f5fb37f18ba318fd528668e8020020)
+was pushed to `main` using Act4rus.
+[GitHub Actions run 39199043980](https://github.com/Epitarthur/CMDL_Project/actions/runs/39199043980)
+passed installation from the lockfile, Ruff lint/formatting, all 12 then-existing tests
+and full-source profiling on a fresh Ubuntu runner. This provides the fresh-environment
+CI evidence for T03; the earlier local run used a package cache.
+
+Florian explicitly approved benchmark v1 and closure of T01–T03 on 2026-10-19.
+Separate contributor signatures and manual teammate-laptop testing are not claimed.
+The completion pass adds five checks (17 total tests) for the complete raw dataset's
+join/overlap reconciliation and the upstream verification command's success/failure
+behavior. Source version/license evidence and slide reconciliation are recorded in
+`dataset-provenance.md`, `data-profile.md` and `docs/evidence/`.
+
+## Additional reproducible evidence commands
+
+After obtaining the metadata and version-pinned archive as described in
+`dataset-provenance.md`:
+
+```sh
+uv run python scripts/verify_upstream.py /tmp/deskdrop-metadata.json /tmp/deskdrop-v5.zip
+uv run python scripts/reconcile_slides.py '/path/to/CMDL-Part-2-Final.pptx'
+```
+
+The deck stays outside the repository; its checksum and checked claims are retained
+in `evidence/slide-reconciliation.json`. These commands do not modify the inputs.

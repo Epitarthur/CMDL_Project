@@ -1,7 +1,7 @@
 {
   "source": "CI&T Deskdrop \u2014 Articles sharing and reading",
   "source_url": "https://www.kaggle.com/datasets/gspmoreira/articles-sharing-reading-from-cit-deskdrop",
-  "note": "Files supplied by Florian. Dataset version, redistribution terms and slide counts have not yet been independently verified. Preserve original bytes.",
+  "note": "Original CSV bytes preserved. Both files verified against publisher version 5 on 2026-10-19. See docs/dataset-provenance.md for attribution, declared license terms and reproducible evidence.",
   "files": [
     {
       "file": "shared_articles.csv",
@@ -13,5 +13,13 @@
       "bytes": 11948038,
       "sha256": "41e39ec53570c18aad1eb347eb3225237d58665811b5d23fa3d24cc81ea7862f"
     }
-  ]
+  ],
+  "upstream_version": 5,
+  "publisher": "Gabriel Moreira / CI&T",
+  "license": {
+    "database": "ODbL-1.0",
+    "contents": "DbCL-1.0",
+    "notice": "../../docs/dataset-provenance.md"
+  },
+  "verification_evidence": "../../docs/evidence/deskdrop-provenance.json"
 }

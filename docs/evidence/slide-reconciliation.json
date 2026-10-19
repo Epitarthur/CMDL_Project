@@ -1,0 +1,46 @@
+{
+  "deck": "CMDL-Part-2-Final.pptx",
+  "sha256": "1975ee040a7995112d6828f51a4ce72064ad8810dd4069d7e5e1cd0c5b7a04e9",
+  "checked_claims": [
+    {
+      "slide": 2,
+      "claim": "3,047 shared articles",
+      "matches_source": true
+    },
+    {
+      "slide": 2,
+      "claim": "72,312 interaction events",
+      "matches_source": true
+    },
+    {
+      "slide": 2,
+      "claim": "1,895 distinct users",
+      "matches_source": true
+    },
+    {
+      "slide": 15,
+      "claim": "11 exact repeated interaction rows",
+      "matches_source": true
+    },
+    {
+      "slide": 15,
+      "claim": "43 interactions across 8 removal-only IDs",
+      "matches_source": true
+    },
+    {
+      "slide": 15,
+      "claim": "95 interactions before first share",
+      "matches_source": true
+    },
+    {
+      "slide": 15,
+      "claim": "All shared rows have title, text, URL, and language",
+      "matches_source": true
+    }
+  ],
+  "source_checksums": {
+    "shared_articles.csv": "5d006115986794aa16b29d77e025c1b456c9ed74f8b897da48bb3d2335f16e3a",
+    "users_interactions.csv": "41e39ec53570c18aad1eb347eb3225237d58665811b5d23fa3d24cc81ea7862f"
+  },
+  "note": "Checks the current final Part 2 deck, not archived proposals or future decks."
+}

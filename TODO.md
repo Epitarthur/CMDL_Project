@@ -1,6 +1,6 @@
 # Project TODO and implementation tickets
 
-Status: implementation started. T03 is implemented and locally validated (hosted CI awaits a push/review); T01 and T02 have draft/evidence deliverables but remain incomplete. Other tickets remain planned.
+Status: T01–T03 completed on 2026-10-19 following Florian’s explicit approval and closure instruction. Benchmark v1 is frozen, publisher version/license and current slide counts are verified, and tooling/CI pass. T04 onward remain planned.
 
 Tickets are local planning records, not GitHub Issues. Owners are defaults. Dependencies use ticket numbers; work within a phase may proceed in parallel when dependencies permit. Update status and link implementation commits/PRs and evidence as work completes.
 
@@ -15,20 +15,20 @@ Tickets are local planning records, not GitHub Issues. Owners are defaults. Depe
 
 ## Foundation
 
-### [ ] T01 — Agree benchmark and data semantics
+### [x] T01 — Agree benchmark and data semantics
 
-**Progress:** Reviewable rules and chronological examples in `docs/benchmark-proposal.md`; team approval pending.
+**Completed:** `deskdrop-temporal-v1`, including cutoffs, signals, eligibility, chronological examples and change control, approved by Florian on 2026-10-19. See `docs/benchmark-proposal.md`; no additional team signatures are claimed.
 
 **Owner:** Florian + Arthur + Charly  
 **Depends on:** None
 
 **Implement / produce:** Document UTC cutoffs after inspecting event distribution; consumption and relevance events; event weights and repeat aggregation; train-only minimum-history filtering; removal/re-share rules; duplicate and unresolved-ID policy; tie-breaking and retraining protocol.
 
-**Validate / acceptance:** Use small chronological examples to demonstrate candidate eligibility, pre-share exclusion, removal/re-share behavior and no future leakage. Team approves docs before model work.
+**Validate / acceptance:** Use small chronological examples to demonstrate candidate eligibility, pre-share exclusion, removal/re-share behavior and no future leakage. Approval is recorded before model work; Florian approved v1 on 2026-10-19.
 
-### [ ] T02 — Verify raw dataset and provenance
+### [x] T02 — Verify raw dataset and provenance
 
-**Progress:** Reproducible CLI, JSON/Markdown profile and tests implemented. See `docs/data-profile.md`. Upstream version/terms and slide reconciliation remain open.
+**Completed:** Verified both CSVs against publisher version 5, documented ODbL/DbCL attribution, reconciled overlapping anomalies and current final Part 2 slide claims, and retained reproducible evidence. See `docs/data-profile.md`, `docs/dataset-provenance.md` and `docs/evidence/`. Original CSV bytes unchanged.
 
 **Owner:** Florian  
 **Depends on:** None
@@ -37,9 +37,9 @@ Tickets are local planning records, not GitHub Issues. Owners are defaults. Depe
 
 **Validate / acceptance:** Reproduce profile from both committed CSVs; reconcile slide counts and overlapping anomaly groups; fail clearly on a changed checksum or malformed input.
 
-### [ ] T03 — Establish Python tooling and CI
+### [x] T03 — Establish Python tooling and CI
 
-**Progress:** Python 3.12.13, uv lockfile, package/CLI, Ruff, pytest and GitHub Actions implemented. Local installation/check evidence is in `docs/development.md`. Hosted CI and team review pending.
+**Completed:** Python 3.12.13, uv lockfile, package/CLI, Ruff, pytest and GitHub Actions implemented and validated locally and in hosted CI. Florian approved closure on 2026-10-19. Evidence: `docs/development.md`; foundation commit `f0aa8fc`, [passing CI](https://github.com/Epitarthur/CMDL_Project/actions/runs/39199043980).
 
 **Owner:** Florian + team  
 **Depends on:** None

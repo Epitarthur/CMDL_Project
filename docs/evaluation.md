@@ -13,20 +13,30 @@ implementation options; their necessity remains open.
 
 ## Shared temporal protocol
 
-Use global chronological training, validation and test periods. Exact cutoffs remain
-open until the event distribution is inspected. Fit features, models, thresholds and
-normalization using permitted earlier data only. User/item minimum-history filters
-use training data only (the Part 3 proposal is a minimum of five interactions).
-Report retained and excluded populations and evaluate cold-start fallbacks separately.
+Protocol **`deskdrop-temporal-v1`** was approved by Florian on 2026-10-19.
+The authoritative rules, examples and change-control policy are in
+[benchmark v1](benchmark-proposal.md).
 
-All models share users, cutoffs and eligible candidate pools. At request time use only
-metadata and events available by that time. Define removal/re-share semantics,
-consumption events, repeat-event aggregation, relevance and validation retraining rules
-before freezing the benchmark. Report unresolved IDs, duplicates and pre-share events.
-Slide anomaly counts are claims to verify, not established facts in this repository.
+Train before 2017-01-01T00:00:00Z, validate during January, and test during February
+2017. All intervals are half-open. Evaluate one request per user at each holdout's
+start with the same available, unseen candidate policy for every model. Fit features,
+models, thresholds and normalization from permitted earlier history only.
+
+Use all five interaction types as consumption/relevance events, approved event
+weights and exact-row deduplication. Minimum user history is five distinct eligible
+articles, calculated on the fitting history only. After validation, freeze parameters
+and retrain on pre-test history; report changed populations and cold-start slices.
+
+Metadata must predate each interaction/request. Same-second lifecycle ambiguity,
+removal-only records, pre-share events and removed items follow the approved exclusion
+precedence. Report exclusion counts without double counting overlapping groups.
+See [verified source findings](data-profile.md) for raw measurements.
 
 Report Recall@10, NDCG@10, catalog coverage, language slices and response time.
-Define metric denominators and treatment of users with no eligible future positives.
+Relevant positives are distinct eligible future user/article pairs; users without
+eligible positives are excluded from averaged ranking metrics and reported separately.
+Coverage uses the fixed request-time catalog, not a sum of user-specific candidate
+lists. Changed benchmark rules require a new protocol version and affected reruns.
 The proposed API latency target is under 300 ms; hardware, load and measurement
 boundary remain to be specified.
 

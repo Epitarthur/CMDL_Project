@@ -1,10 +1,14 @@
-# Benchmark proposal — awaiting team review
+# Benchmark v1 — approved
 
-This is a draft for T01, not an approved benchmark or an implemented snapshot policy.
-It uses the measured source distribution in `data-profile.md`. Resolve it with Arthur
-and Charly before ingestion/snapshot/model work depends on these rules.
+Protocol ID: `deskdrop-temporal-v1`. Approved by Florian on 2026-10-19 in this
+project chat, with explicit authorization to close T01–T03. This records Florian’s
+approval; it does not claim separate approvals from Arthur or Charly.
 
-## Proposed time periods
+This is the agreed contract for subsequent ingestion, snapshots and model evaluation.
+Implementation of those components remains in T07/T08/T10/T15. The filename is kept
+stable for existing links. Source findings are in `data-profile.md`.
+
+## Time periods
 
 Use UTC half-open intervals:
 
@@ -24,7 +28,7 @@ pre-test data before the test request. Recompute minimum-history filters from th
 retraining history, not from test activity. Report changing evaluation populations.
 Never tune decisions or hyperparameters from the final test outcome.
 
-## Proposed event and record handling
+## Event and record handling
 
 - Preserve all raw rows and identify them by file checksum plus 1-based data-row
   number (CSV records excluding the header, not physical lines).
@@ -40,11 +44,11 @@ Never tune decisions or hyperparameters from the final test outcome.
   later unambiguous lifecycle event. A later share restores availability.
 - Never recover unavailable historical metadata from a later share. Metadata must
   come from a share strictly before the relevant interaction or request.
-- Tentative event weights: VIEW=1, LIKE=2, BOOKMARK=3, FOLLOW=4, COMMENT CREATED=5.
+- Event weights: VIEW=1, LIKE=2, BOOKMARK=3, FOLLOW=4, COMMENT CREATED=5.
   After exact duplicate handling, sum weights per user/article. Use a monotone
   `log1p(sum)` strength; ALS confidence scaling is a later validation parameter.
-  Team must review the ordering; these are choices, not measured user preferences.
-- Apply the proposed minimum of five distinct eligible articles per training user
+  These weights are benchmark choices, not measured user preferences.
+- Apply the minimum of five distinct eligible articles per training user
   using only permitted training history. Keep low-history/new users as separately
   reported fallback slices. Do not derive filters from full-source interaction counts.
 - One relevant positive per distinct eligible user/article pair in the holdout;
@@ -55,11 +59,11 @@ Never tune decisions or hyperparameters from the final test outcome.
   ranking metrics and publish the denominator. Define coverage as the union of
   recommended IDs divided by the fixed request-time eligible catalog.
 
-## Chronological examples for team review
+## Accepted chronological examples
 
 Suppose A is shared at t=10, removed at t=20 and shared again at t=30.
 
-| Event/request | Proposed result |
+| Event/request | Expected result |
 | --- | --- |
 | Interaction with A at t=9 | Excluded; later metadata is unavailable. |
 | Interaction/request at t=10 | A omitted; within-second order unknown. |
@@ -75,9 +79,18 @@ Boundary: an interaction exactly at 2017-01-01T00:00:00Z belongs to validation,
 never training or the request-time consumption history. Its article must already
 be available strictly before the request to count as an eligible positive.
 
-## Approval questions
+## Versioning and change control
 
-Agree cutoffs, one-request-per-period evaluation, relevance/weights, five-distinct-
-article filtering, conservative same-second behavior and retraining populations.
-Confirm exclusion precedence and metadata rules before implementing T07/T08.
-These examples should become executable snapshot tests once T01 is approved.
+All downstream run manifests must record `deskdrop-temporal-v1`, the source checksums,
+and the configuration/code revision. A methodological change creates a new protocol
+version with a dated reason and approver. Preserve earlier rules and results; do not
+compare scores across protocol versions as evidence of a model improvement.
+
+Rerun affected preparation, training, rankings and metrics when weights, cutoffs,
+filters, relevance, eligibility or retraining rules change. Pure wording corrections
+that do not change behavior may retain the ID and must be noted. Changes influenced
+by observed test results must be disclosed; reserve a fresh holdout where feasible.
+
+These accepted examples become executable snapshot tests in T08. Existing profiler
+tests already cover temporal anomalies and conflicting timestamps; they do not
+constitute a complete snapshot or recommender implementation.

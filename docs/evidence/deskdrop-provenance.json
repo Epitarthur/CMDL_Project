@@ -1,0 +1,38 @@
+{
+  "verified_on": "2026-10-19",
+  "metadata_url": "https://www.kaggle.com/api/v1/datasets/view/gspmoreira/articles-sharing-reading-from-cit-deskdrop",
+  "metadata_response_sha256": "27a3578813e25092cd025ef2044a4ec449b8a930348ebbcd3c35d5662737bae6",
+  "publisher_metadata": {
+    "id": 2234,
+    "ref": "gspmoreira/articles-sharing-reading-from-cit-deskdrop",
+    "title": "Articles sharing and reading from CI&T DeskDrop",
+    "creatorName": "Gabriel Moreira",
+    "ownerRef": "gspmoreira",
+    "currentVersionNumber": 5,
+    "lastUpdated": "2017-08-27T21:33:01.063Z",
+    "licenseName": "Database: Open Database, Contents: Database Contents",
+    "totalBytes": 29942455
+  },
+  "version_notes": "Fixes on timestamps",
+  "download_url": "https://www.kaggle.com/api/v1/datasets/download/gspmoreira/articles-sharing-reading-from-cit-deskdrop?datasetVersionNumber=5",
+  "download_archive_sha256": "f1df93edb41fe706148a04567e61952429bcc042206758da64f17ee0f5654285",
+  "archive_files": [
+    {
+      "file": "shared_articles.csv",
+      "bytes": 17994417,
+      "sha256": "5d006115986794aa16b29d77e025c1b456c9ed74f8b897da48bb3d2335f16e3a",
+      "matches_committed_source": true
+    },
+    {
+      "file": "users_interactions.csv",
+      "bytes": 11948038,
+      "sha256": "41e39ec53570c18aad1eb347eb3225237d58665811b5d23fa3d24cc81ea7862f",
+      "matches_committed_source": true
+    }
+  ],
+  "license_urls": {
+    "database": "https://opendatacommons.org/licenses/odbl/1-0/",
+    "contents": "https://opendatacommons.org/licenses/dbcl/1-0/"
+  },
+  "method": "Public publisher metadata plus version-pinned ZIP download; compare each decompressed CSV SHA-256 and byte count with the committed manifest. Archive packaging hash is observational; the CSV hashes identify inputs."
+}

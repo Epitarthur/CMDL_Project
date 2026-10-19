@@ -88,6 +88,14 @@ def test_chronology_overlap_and_exact_ids(tmp_path):
     assert report["files"]["users_interactions.csv"]["exact_duplicate_affected_rows"] == 2
     assert report["repeated_user_article_pairs"] == 1
     assert report["repeat_excess_interactions"] == 5
+    assert report["join_reconciliation"] == {
+        "raw_article_event_inner_join_rows": 19,
+        "unique_shared_metadata_inner_join_rows": 6,
+        "distinct_user_article_pairs": 3,
+        "temporal_or_join_flagged_rows": 5,
+    }
+    assert report["shared_metadata"]["rows"] == 2
+    assert report["article_lifecycle"]["latest_unambiguous_shared_content_ids"] == 1
     assert report == profile(raw)
 
 

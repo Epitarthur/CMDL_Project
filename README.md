@@ -6,7 +6,8 @@ Deskdrop article recommendation with metadata quality evaluation.
 
 Python package, locked development tooling, CI workflow and a tested source-data
 profiler are implemented. Application services, models, database migrations and
-Docker services remain planned.
+Docker services remain planned. T01–T03 are complete: benchmark v1 is approved,
+dataset version/license and presentation counts are verified, and CI has passed.
 
 ## Planned stack
 
@@ -22,7 +23,9 @@ run on a teammate’s laptop. Preparation and training run as explicit batch job
 - [Evaluation plan](docs/evaluation.md)
 - [Team ownership and delivery sequence](docs/delivery.md)
 - [Decisions and open questions](docs/decisions.md)
-- [Dataset provenance](data/raw/manifest.json)
+- [Approved benchmark v1](docs/benchmark-proposal.md)
+- [Dataset provenance and attribution](docs/dataset-provenance.md)
+- [Source manifest](data/raw/manifest.json)
 
 Original CSVs are tracked under `data/raw/`. Derived data, models and rankings are
 local outputs and are excluded from Git. Keep original source files unchanged.
@@ -50,6 +53,6 @@ with `--raw-dir` and `--output-dir`; output must stay outside the raw directory.
 Existing reports are not refreshed after a failed validation, so check the exit code.
 
 See [verified dataset findings](docs/data-profile.md) and the
-[benchmark proposal awaiting team review](docs/benchmark-proposal.md).
+[approved benchmark v1](docs/benchmark-proposal.md).
 The notebook `notebooks/source_profile.ipynb` offers an optional interactive entry
 point; Jupyter is not a core development dependency.

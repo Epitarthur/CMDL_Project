@@ -176,13 +176,45 @@ def profile(raw_dir: Path) -> dict:
         "ambiguous_previous_article_state",
     ]
     repeated = Counter((r["personId"], r["contentId"]) for r in interaction_rows)
+    shares = [row for row in article_rows if row["eventType"] == "CONTENT SHARED"]
+    article_event_counts = Counter(row["contentId"] for row in article_rows)
     return {
-        "profile_version": 1,
+        "profile_version": 2,
         "source": manifest.get("source"),
         "source_url": manifest.get("source_url"),
+        "provenance": {
+            "upstream_version": manifest.get("upstream_version"),
+            "license": manifest.get("license"),
+            "verification_evidence": manifest.get("verification_evidence"),
+        },
         "files": {"shared_articles.csv": articles, "users_interactions.csv": interactions},
+        "shared_metadata": {
+            "rows": len(shares),
+            "languages": dict(sorted(Counter(row["lang"] for row in shares).items())),
+            "distinct_urls": len({row["url"] for row in shares}),
+            "distinct_titles": len({row["title"] for row in shares}),
+            "missing_core_fields": {
+                field: sum(not row[field].strip() for row in shares)
+                for field in ["title", "text", "url", "lang"]
+            },
+        },
+        "join_reconciliation": {
+            "raw_article_event_inner_join_rows": sum(
+                article_event_counts[row["contentId"]] for row in interaction_rows
+            ),
+            "unique_shared_metadata_inner_join_rows": sum(
+                row["contentId"] in first_share for row in interaction_rows
+            ),
+            "distinct_user_article_pairs": len(repeated),
+            "temporal_or_join_flagged_rows": len(interaction_rows)
+            - combinations["no_temporal_or_join_flag"],
+        },
         "article_lifecycle": {
             "shared_content_ids": len(first_share),
+            "latest_unambiguous_shared_content_ids": sum(
+                {e for t, e in events if t == events[-1][0]} == {"CONTENT SHARED"}
+                for events in timelines.values()
+            ),
             "removal_only_content_ids": len(set(timelines) - set(first_share)),
             "multiple_share_content_ids": sum(
                 sum(e == "CONTENT SHARED" for _, e in events) > 1 for events in timelines.values()
@@ -216,8 +248,8 @@ def profile(raw_dir: Path) -> dict:
             "Temporal state uses strictly earlier article events; "
             "equal timestamps are flagged separately.",
             "Repeated shares are not necessarily re-shares after removal.",
-            "Source version, redistribution terms and presentation counts "
-            "still require verification.",
+            "Publisher version/license evidence and slide reconciliation are documented in docs; "
+            "the profiler verifies source bytes and does not re-query upstream services.",
         ],
     }
 

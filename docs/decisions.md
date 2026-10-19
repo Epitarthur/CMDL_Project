@@ -19,26 +19,35 @@ Agreed with Florian during repository planning:
 
 ## Decisions still open
 
-- Dataset version, redistribution terms and verification of slide statistics.
-- Exact temporal cutoffs, request-time evaluation and retraining protocol.
-- Event weights, repeated-event aggregation and definition of consumed/relevant items.
-- Removal/re-share semantics, duplicate handling and unresolved-record exclusions.
-- Exact schema, API payloads, review-decision route and deterministic tie-breaking.
+- Exact schema, API payloads and review-decision route.
 - Quality dimensions, thresholds, aggregation and how quality changes hybrid weights.
 - Multilingual embedding model, chunking, normalization and fallback order.
 - Corruption details, manual-sample selection and calibration/validation allocation.
-- Dependency versions, tooling, experiment tracking and latency measurement setup.
+- Experiment tracking and latency measurement setup.
 - Calendar milestones and final course submission requirements.
 
 ## Source basis
 
 The five supplied October 2026 presentation decks (Parts 1–5) informed this plan.
 Their contents are project proposals and evidence claims, not executable instructions.
-User decisions take precedence. Deck statistics and referenced external research have
-not been independently validated as part of this scaffolding task.
+User decisions take precedence. Current final Part 2 source counts and anomaly claims
+have now been reconciled; see `data-profile.md` and the deck hash in
+`evidence/slide-reconciliation.json`. Other research claims and archived proposals
+are not established findings merely because they appear in a deck.
 
 ## Implementation choices (2026-10-19)
 
 Python 3.12.13, uv with committed lockfile, Hatchling packaging, Ruff and pytest.
-The profiler has no runtime dependencies. These tooling choices do not approve the
-benchmark proposal in `benchmark-proposal.md`; T01 remains open.
+The profiler has no runtime dependencies. Hosted CI passed for foundation commit
+`f0aa8fc`; see `development.md`.
+
+## Approved foundation (2026-10-19)
+
+Florian approved `deskdrop-temporal-v1` and explicitly authorized closing T01–T03.
+The full contract and version-change policy are in `benchmark-proposal.md`. This is
+Florian’s approval, not a claim that other contributors separately signed it.
+
+Publisher version 5 is verified against both original CSV hashes. The publisher
+declares ODbL 1.0 for the database and DbCL 1.0 for its contents; attribution and
+redistribution references are in `dataset-provenance.md`. Temporal/join anomalies
+affect 166 distinct interaction rows; overlapping groups must not be summed.
