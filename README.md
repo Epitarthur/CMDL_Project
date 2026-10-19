@@ -14,6 +14,8 @@ run on a teammate’s laptop. Preparation and training run as explicit batch job
 
 ## Start here
 
+- [Implementation tickets and acceptance criteria](TODO.md)
+
 - [Architecture and repository layout](docs/architecture.md)
 - [Shared contracts](docs/contracts.md)
 - [Evaluation plan](docs/evaluation.md)
