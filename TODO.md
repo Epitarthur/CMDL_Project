@@ -1,6 +1,6 @@
 # Project TODO and implementation tickets
 
-Status: planning backlog. The source datasets and empty scaffold exist; the implementation tickets below are not completed.
+Status: implementation started. T03 is implemented and locally validated (hosted CI awaits a push/review); T01 and T02 have draft/evidence deliverables but remain incomplete. Other tickets remain planned.
 
 Tickets are local planning records, not GitHub Issues. Owners are defaults. Dependencies use ticket numbers; work within a phase may proceed in parallel when dependencies permit. Update status and link implementation commits/PRs and evidence as work completes.
 
@@ -17,6 +17,8 @@ Tickets are local planning records, not GitHub Issues. Owners are defaults. Depe
 
 ### [ ] T01 — Agree benchmark and data semantics
 
+**Progress:** Reviewable rules and chronological examples in `docs/benchmark-proposal.md`; team approval pending.
+
 **Owner:** Florian + Arthur + Charly  
 **Depends on:** None
 
@@ -26,6 +28,8 @@ Tickets are local planning records, not GitHub Issues. Owners are defaults. Depe
 
 ### [ ] T02 — Verify raw dataset and provenance
 
+**Progress:** Reproducible CLI, JSON/Markdown profile and tests implemented. See `docs/data-profile.md`. Upstream version/terms and slide reconciliation remain open.
+
 **Owner:** Florian  
 **Depends on:** None
 
@@ -34,6 +38,8 @@ Tickets are local planning records, not GitHub Issues. Owners are defaults. Depe
 **Validate / acceptance:** Reproduce profile from both committed CSVs; reconcile slide counts and overlapping anomaly groups; fail clearly on a changed checksum or malformed input.
 
 ### [ ] T03 — Establish Python tooling and CI
+
+**Progress:** Python 3.12.13, uv lockfile, package/CLI, Ruff, pytest and GitHub Actions implemented. Local installation/check evidence is in `docs/development.md`. Hosted CI and team review pending.
 
 **Owner:** Florian + team  
 **Depends on:** None

@@ -12,3 +12,8 @@ __pycache__/
 /artifacts/*
 !/artifacts/.gitkeep
 mlruns/
+
+.ruff_cache/
+/build/
+/dist/
+*.egg-info/

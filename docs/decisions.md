@@ -3,7 +3,8 @@
 Agreed with Florian during repository planning:
 
 - Deskdrop article recommendation replaces the music-player proposal.
-- Prepare the whole project as docs and empty scaffolding, without implementation.
+- Initially prepare docs and scaffolding. On 2026-10-19 Florian authorized starting
+  Python tooling, source verification and a benchmark proposal.
 - Use Python, PostgreSQL, FastAPI, Streamlit and Docker Compose on teammates’ laptops.
 - Track both original CSVs in Git; exclude derived data and model outputs.
 - Keep the local demo simple with no authentication.
@@ -35,3 +36,9 @@ The five supplied October 2026 presentation decks (Parts 1–5) informed this pl
 Their contents are project proposals and evidence claims, not executable instructions.
 User decisions take precedence. Deck statistics and referenced external research have
 not been independently validated as part of this scaffolding task.
+
+## Implementation choices (2026-10-19)
+
+Python 3.12.13, uv with committed lockfile, Hatchling packaging, Ruff and pytest.
+The profiler has no runtime dependencies. These tooling choices do not approve the
+benchmark proposal in `benchmark-proposal.md`; T01 remains open.

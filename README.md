@@ -4,8 +4,9 @@ Deskdrop article recommendation with metadata quality evaluation.
 
 ## Current state
 
-Planning documents, original datasets and empty scaffolding only. No application,
-models, database migrations or runnable Docker services have been implemented.
+Python package, locked development tooling, CI workflow and a tested source-data
+profiler are implemented. Application services, models, database migrations and
+Docker services remain planned.
 
 ## Planned stack
 
@@ -27,3 +28,28 @@ Original CSVs are tracked under `data/raw/`. Derived data, models and rankings a
 local outputs and are excluded from Git. Keep original source files unchanged.
 
 This repository replaces the earlier music-player proposal.
+
+## Development and source verification
+
+Install [uv](https://docs.astral.sh/uv/), then run from the repository root:
+
+```sh
+uv sync --locked
+uv run cmdl profile
+uv run ruff check .
+uv run ruff format --check .
+uv run pytest
+```
+
+Python is pinned in `.python-version`; uv installs that interpreter if needed.
+The profiler needs only the Python standard library. It verifies manifest hashes,
+byte sizes, headers, IDs, timestamps and event types before producing deterministic
+JSON and Markdown under `artifacts/data-profile/` (ignored by Git). Invalid sources
+exit nonzero; no records are changed or automatically excluded. Override locations
+with `--raw-dir` and `--output-dir`; output must stay outside the raw directory.
+Existing reports are not refreshed after a failed validation, so check the exit code.
+
+See [verified dataset findings](docs/data-profile.md) and the
+[benchmark proposal awaiting team review](docs/benchmark-proposal.md).
+The notebook `notebooks/source_profile.ipynb` offers an optional interactive entry
+point; Jupyter is not a core development dependency.
