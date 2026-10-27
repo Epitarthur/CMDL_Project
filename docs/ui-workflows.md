@@ -68,6 +68,10 @@ review diffs focused:
 | T24 | codex/t24-workflows | codex/t23-reviewer |
 
 After each preceding UI PR merges, retarget its successor to main as appropriate.
-Do not close T22–T24 solely from the fixture-backed checks. GitHub publication is
-currently blocked: SSH lacks repository write permission and the selected Act4rus
-connector returns HTTP 403 Resource not accessible by integration for branch creation.
+Do not close T22–T24 solely from the fixture-backed checks. All four branches are
+published, with separate PRs linked in ui-pull-requests.md. The UI PRs are drafts.
+Publication used the Act4rus CLI login over HTTPS: its repository push permission
+is true. FLOWleplusbeau has read permission but push permission is false. Connector
+branch creation returned HTTP 403 for both accounts; sandboxed CLI authentication
+checks also failed, but both local logins validated outside the sandbox. No remote
+main changes or merges were made.

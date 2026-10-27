@@ -1,8 +1,13 @@
 # Prepared UI pull requests
 
-Publication is blocked by GitHub access. These are the review-ready descriptions
-for the separate ticket branches; no PR URLs exist yet. See ui-workflows.md for
-branch bases and outstanding live acceptance.
+Published on 2026-10-27 using the authorized Act4rus CLI login over HTTPS.
+The connector's 403 did not reflect that account's repository write permission.
+See ui-workflows.md for branch bases and outstanding live acceptance.
+
+- [T09 — run tracking, PR #1](https://github.com/Epitarthur/CMDL_Project/pull/1)
+- [T22 — reader, draft PR #2](https://github.com/Epitarthur/CMDL_Project/pull/2)
+- [T23 — reviewer, draft PR #3](https://github.com/Epitarthur/CMDL_Project/pull/3)
+- [T24 — workflows, draft PR #4](https://github.com/Epitarthur/CMDL_Project/pull/4)
 
 ## T22 — Build the reader interface with approved API examples
 
