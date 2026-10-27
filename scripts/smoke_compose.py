@@ -112,7 +112,7 @@ def main() -> None:
             assert response.json()["database"] == "connected"
             assert client.get(f"http://127.0.0.1:{env['API_PORT']}/ready").status_code == 503
             client.get(f"http://127.0.0.1:{env['UI_PORT']}/_stcore/health").raise_for_status()
-        # Run the actual Streamlit script with its real container API URL.
+        # Exercise the packaged reader examples; product API routes remain T21.
         compose(
             "exec",
             "-T",
@@ -122,7 +122,9 @@ def main() -> None:
             "from streamlit.testing.v1 import AppTest; "
             "a=AppTest.from_file('src/cmdl/ui/app.py').run(timeout=20); "
             "assert not a.exception; assert not a.error; "
-            "assert 'PostgreSQL connected' in a.success[0].value; assert len(a.info)==1",
+            "a.button[0].click().run(timeout=20); "
+            "assert not a.exception; assert not a.error; "
+            "assert any(s.value == 'Your reading list' for s in a.subheader)",
         )
         compose(
             "--profile",
