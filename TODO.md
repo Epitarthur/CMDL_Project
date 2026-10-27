@@ -276,6 +276,13 @@ Live T21 integration and visual review remain; this ticket stays open.
 
 **Validate / acceptance:** Verify warning/record/version match, saved decision visibility after refresh, error recovery and unchanged original records.
 
+**Progress (2026-10-27):** Reviewer screen displays collection coverage, matching original
+metadata and field warnings, confirm/reject forms and ordered decision history. Shared
+live adapter validates snapshot/version associations and retries saves with stable
+idempotency keys. Example decisions are explicitly session-only. Interaction checks
+cover label validation, replay and history visibility. See [reviewer guide](docs/reviewer-ui.md).
+T18/T21 live persistence and visual review remain; this ticket stays open.
+
 ### [ ] T24 — Verify complete integrated workflows
 
 **Owner:** Youssef + team  
