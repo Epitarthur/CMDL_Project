@@ -261,6 +261,12 @@ See [snapshot guide](docs/snapshots.md) and [validation](docs/development.md).
 
 **Validate / acceptance:** Check loading, new-user fallback, short/empty results, missing quality, changed record versions and service failure/retry; no stale success after a failure.
 
+**Progress (2026-10-27):** Reader screen and shared example/live adapter implemented.
+Approved scenarios cover normal, fallback, short/empty and failed requests; inspection
+shows matching metadata/quality and rejects changed live versions. Streamlit interaction
+checks cover order, inspection and failure recovery. See [reader guide](docs/reader-ui.md).
+Live T21 integration and visual review remain; this ticket stays open.
+
 ### [ ] T23 — Build Streamlit reviewer screen
 
 **Owner:** Youssef + Charly  
