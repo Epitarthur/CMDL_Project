@@ -292,6 +292,13 @@ T18/T21 live persistence and visual review remain; this ticket stays open.
 
 **Validate / acceptance:** One request returns correct order and versions; no unavailable/read items; review survives restart; failed request then retry recovers; missing quality remains visibly unavailable.
 
+**Progress (2026-10-27):** HTTP-boundary workflow rehearsals exercise real UI/adapters
+with approved fixtures, retained test output, ordered reader results, missing quality,
+failure/retry, version rejection, lost save acknowledgments, idempotent replay and
+history across fresh UI sessions. Desktop browser inspection is recorded in the
+[workflow guide](docs/ui-workflows.md). Production eligibility, real API/database
+restart persistence and Compose end-to-end evidence await T18/T20/T21; T24 stays open.
+
 ## Research extensions and experiments
 
 ### [ ] T25 — Add multilingual semantic content branch

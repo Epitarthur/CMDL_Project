@@ -27,7 +27,12 @@ def render(api_url):
         report_fixture = "quality_report_partial_coverage"
         if demo:
             report_fixture = st.selectbox(
-                "Collection example", ["quality_report_partial_coverage", "quality_report_no_run"]
+                "Collection example",
+                ["quality_report_partial_coverage", "quality_report_no_run"],
+                format_func=lambda key: {
+                    "quality_report_partial_coverage": "Partial collection coverage",
+                    "quality_report_no_run": "No quality assessment",
+                }[key],
             )
         with st.spinner("Loading collection summary…"):
             report = client.report(report_fixture)
@@ -47,7 +52,10 @@ def render(api_url):
                 f"{report['warning_count']} warnings · "
                 "Review counts are decision events, not confirmed errors."
             )
-            st.write("Saved decision events", report["review_decision_counts"])
+            counts = report["review_decision_counts"]
+            st.write(
+                f"Saved decisions: {counts['confirm']} confirmed · {counts['reject']} rejected"
+            )
             with st.expander("Collection dimension summaries"):
                 for name, score in report["dimension_means"].items():
                     value = "Unassessed" if score is None else f"{score:.0%}"
@@ -86,7 +94,13 @@ def render(api_url):
         st.subheader(metadata.get("title") or "Untitled article")
         with st.expander("Original metadata", expanded=True):
             st.write(metadata.get("text") or "No text supplied")
-            st.json(metadata)
+            st.caption(
+                f"Language: {metadata.get('lang') or 'Not supplied'} · "
+                f"Content type: {metadata.get('content_type') or 'Not supplied'}"
+            )
+            st.write("Source URL: " + (metadata.get("url") or "Not supplied"))
+            with st.expander("Original field values"):
+                st.json(metadata)
         if quality["status"] != "available":
             st.info(f"Quality unavailable · {quality.get('reason', 'not assessed')}")
             return
