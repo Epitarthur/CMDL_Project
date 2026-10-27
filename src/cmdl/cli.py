@@ -87,6 +87,49 @@ def _snapshot_command(args) -> int:
     return 0
 
 
+def _run_command(args) -> int:
+    import json
+
+    import psycopg
+
+    from cmdl.data.snapshots import load_snapshot
+    from cmdl.data.temporal import TemporalError
+    from cmdl.runs import RunError, create_run, environment, verify_run
+
+    try:
+        if args.verify is not None:
+            verify_run(args.verify)
+            print(f"Verified run: {args.verify.name}")
+            return 0
+        if args.snapshot_id is None or args.config is None:
+            raise RunError("Capture requires --snapshot-id and --config")
+        repository = Path(__file__).resolve().parents[2]
+        provenance = environment(repository)
+        config = json.loads(args.config.read_text())
+        with psycopg.connect(connect_timeout=5) as connection:
+            load_snapshot(connection, args.snapshot_id)
+            manifest = connection.execute(
+                "SELECT source_manifest FROM snapshots WHERE snapshot_id=%s",
+                (args.snapshot_id,),
+            ).fetchone()[0]
+        target = create_run(
+            repository / "artifacts" / "runs",
+            provenance=provenance,
+            snapshot={"snapshot_id": str(args.snapshot_id), "descriptor": manifest["descriptor"]},
+            config=config,
+        )
+    except (RunError, TemporalError, OSError, ValueError, TypeError) as exc:
+        print(f"Run tracking failed: {exc}", file=sys.stderr)
+        return 1
+    except psycopg.Error as exc:
+        print(
+            f"Run tracking failed (database error {exc.sqlstate or 'connection'})", file=sys.stderr
+        )
+        return 1
+    print(f"Captured run: {target}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -101,7 +144,13 @@ def main(argv: list[str] | None = None) -> int:
     snapshot.add_argument("--variant-id", default="original")
     snapshot.add_argument("--output-dir", type=Path, default=Path("artifacts/snapshots"))
     commands.add_parser("migrate", help="Apply pending PostgreSQL migrations using PG* settings")
+    run = commands.add_parser("run", help="Capture or verify a reproducible local run")
+    run.add_argument("--snapshot-id", type=UUID)
+    run.add_argument("--config", type=Path)
+    run.add_argument("--verify", type=Path)
     args = parser.parse_args(argv)
+    if args.command == "run":
+        return _run_command(args)
     if args.command == "snapshot":
         return _snapshot_command(args)
     if args.command == "ingest":

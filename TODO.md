@@ -1,6 +1,6 @@
 # Project TODO and implementation tickets
 
-Status: T01–T03 completed on 2026-10-19 following Florian’s explicit approval and closure instruction. Benchmark v1 is frozen, publisher version/license and current slide counts are verified, and tooling/CI pass. T04’s schema and API contract are approved and complete; T05’s Docker environment is implemented and locally verified; T06 migrations and database guards are implemented and verified; T07 ingestion and its exclusion audit are implemented and verified; T08 published snapshots and temporal inputs are implemented and verified; T09 onward remain planned.
+Status: T01–T03 completed on 2026-10-19 following Florian’s explicit approval and closure instruction. Benchmark v1 is frozen, publisher version/license and current slide counts are verified, and tooling/CI pass. T04’s schema and API contract are approved and complete; T05’s Docker environment is implemented and locally verified; T06 migrations and database guards are implemented and verified; T07 ingestion and its exclusion audit are implemented and verified; T08 published snapshots and temporal inputs are implemented and verified; T09 local run tracking is implemented; T10 onward remain planned.
 
 Tickets are local planning records, not GitHub Issues. Owners are defaults. Dependencies use ticket numbers; work within a phase may proceed in parallel when dependencies permit. Update status and link implementation commits/PRs and evidence as work completes.
 
@@ -129,7 +129,7 @@ Snapshot/variant/holdout checks and Docker publication/persistence/reset pass.
 See [snapshot guide](docs/snapshots.md) and [validation](docs/development.md).
 
 
-### [ ] T09 — Implement run manifests and artifact tracking
+### [x] T09 — Implement run manifests and artifact tracking
 
 **Owner:** Arthur + Florian  
 **Depends on:** T03, T08
@@ -137,6 +137,13 @@ See [snapshot guide](docs/snapshots.md) and [validation](docs/development.md).
 **Implement / produce:** Record code revision, dependencies, source checksums, transformations, versions, cutoffs, parameters and seeds. Define artifact paths and choose lightweight tracking or MLflow.
 
 **Validate / acceptance:** Same configuration reproduces inputs and rankings within documented numeric tolerance; changed inputs produce distinguishable run identities; artifacts remain outside Git.
+
+**Evidence (2026-10-27):** Content-addressed local manifests pin clean Git revision,
+locked/installed dependencies, published snapshot descriptors, model/transform versions,
+parameters, seeds and numeric tolerance. Atomic artifact capture/replay verifies byte
+checksums and distinguishes changed inputs/outputs. See [run tracking](docs/runs.md).
+Validation uses illustrative rankings; trained-model reproducibility remains with the
+model tickets. No serving model publication or hosted CI result is claimed.
 
 ## Recommendation baseline
 

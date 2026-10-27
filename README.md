@@ -11,7 +11,7 @@ implement the approved storage schema. CSV ingestion preserves source lineage an
 produces a repeatable exclusion audit. Published temporal snapshots supply a shared
 candidate/history policy. Models and product API/UI features remain planned. T01–T03 are complete: benchmark v1 is approved,
 dataset version/license and presentation counts are verified, and CI has passed.
-T04’s database schema and API contract are approved. T01–T08 are complete; published snapshots, ingestion and the environment pass local verification.
+T04’s database schema and API contract are approved. T09 local run tracking is implemented (see [run guide](docs/runs.md)). T01–T08 are complete; published snapshots, ingestion and the environment pass local verification.
 
 ## Local services
 
