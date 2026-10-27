@@ -32,4 +32,6 @@ review persistence without source edits, short/empty results, missing quality re
 service failure and successful retry. Model accuracy and warning validity require
 separate evaluations. Do not treat UI integration checks as proof of either.
 
-No runnable startup instructions exist yet. Add and verify them during implementation.
+Service startup is documented in compose.md; interface previews and remaining live
+acceptance checks are documented in ui-workflows.md. Full reproducible model/demo
+preparation remains T30.

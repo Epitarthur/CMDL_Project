@@ -6,7 +6,7 @@ Deskdrop article recommendation with metadata quality evaluation.
 
 Python package, locked development tooling, CI workflow and a tested source-data
 profiler are implemented. Docker Compose now provides PostgreSQL, a FastAPI
-bootstrap and a Streamlit development status screen. PostgreSQL migrations
+bootstrap and Streamlit reader/reviewer screens with explicit illustrative examples. PostgreSQL migrations
 implement the approved storage schema. CSV ingestion preserves source lineage and
 produces a repeatable exclusion audit. Published temporal snapshots supply a shared
 candidate/history policy. Models and product API/UI features remain planned. T01–T03 are complete: benchmark v1 is approved,
@@ -26,6 +26,14 @@ Then [prepare snapshots](docs/snapshots.md) using the completed import UUID.
 
 Open [Streamlit](http://localhost:8501). See [startup, jobs, persistence and reset](docs/compose.md).
 Recommendation serving remains at 503 until ranking artifacts and product endpoints exist.
+
+## Interface preview
+
+Run `uv run streamlit run src/cmdl/ui/app.py`, or open the Compose UI above.
+Choose Reader or Reviewer in the sidebar. Examples mode works without model/API
+outputs; example reviews last only for the browser session. Live product integration
+is still planned. See [reader](docs/reader-ui.md), [reviewer](docs/reviewer-ui.md), and
+[workflow verification](docs/ui-workflows.md).
 
 ## Stack
 

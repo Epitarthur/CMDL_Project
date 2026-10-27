@@ -74,3 +74,52 @@ class ReaderClient:
         ):
             raise ServiceError("The quality report does not match this article version.")
         return current, quality
+
+
+class ReviewerClient(ReaderClient):
+    def report(self, fixture="quality_report_partial_coverage"):
+        return self.get("/quality/report", fixture=fixture)
+
+    def quality(self, version, snapshot, fixture="quality_available"):
+        result = self.get(f"/quality/{version}", {"snapshot_id": snapshot}, fixture=fixture)
+        quality = result["quality"]
+        if (
+            result["context"]["snapshot_id"] != snapshot
+            or quality["snapshot_id"] != snapshot
+            or quality["metadata_version_id"] != version
+        ):
+            raise ServiceError("Quality does not match the selected snapshot and metadata version.")
+        return quality
+
+    def article(self, content_id, version, snapshot):
+        result = self.get(f"/articles/{content_id}", {"snapshot_id": snapshot}, fixture="article")
+        article = result["article"]
+        if (
+            result["context"]["snapshot_id"] != snapshot
+            or article["content_id"] != content_id
+            or article["metadata_version_id"] != version
+        ):
+            raise ServiceError("Article does not match the selected metadata version.")
+        return article
+
+    def submit(self, warning_id, payload):
+        if self.api_url is None:
+            raise ServiceError("Example decisions must remain in the browser session.")
+        try:
+            response = httpx.post(
+                self.api_url.rstrip("/") + f"/quality/warnings/{warning_id}/reviews",
+                json=payload,
+                timeout=5,
+            )
+            body = response.json()
+        except (httpx.HTTPError, ValueError) as exc:
+            raise ServiceError(
+                "Could not verify the save. Retry the same decision safely.", True
+            ) from exc
+        if response.status_code not in (200, 201):
+            raise ServiceError(body.get("message", "Save failed."), body.get("retryable", False))
+        if body.get("warning_id") != warning_id or any(
+            body.get(key) != value for key, value in payload.items()
+        ):
+            raise ServiceError("The saved response does not match the submitted review.")
+        return body

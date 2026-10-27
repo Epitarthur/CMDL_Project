@@ -283,6 +283,13 @@ Live T21 integration and visual review remain; this ticket stays open.
 
 **Validate / acceptance:** Verify warning/record/version match, saved decision visibility after refresh, error recovery and unchanged original records.
 
+**Progress (2026-10-27):** Reviewer screen displays collection coverage, matching original
+metadata and field warnings, confirm/reject forms and ordered decision history. Shared
+live adapter validates snapshot/version associations and retries saves with stable
+idempotency keys. Example decisions are explicitly session-only. Interaction checks
+cover label validation, replay and history visibility. See [reviewer guide](docs/reviewer-ui.md).
+T18/T21 live persistence and visual review remain; this ticket stays open.
+
 ### [ ] T24 — Verify complete integrated workflows
 
 **Owner:** Youssef + team  
@@ -291,6 +298,13 @@ Live T21 integration and visual review remain; this ticket stays open.
 **Implement / produce:** Create repeatable integration scenarios with fixed inputs and retained API/test evidence for reader, inspection and review flows.
 
 **Validate / acceptance:** One request returns correct order and versions; no unavailable/read items; review survives restart; failed request then retry recovers; missing quality remains visibly unavailable.
+
+**Progress (2026-10-27):** HTTP-boundary workflow rehearsals exercise real UI/adapters
+with approved fixtures, retained test output, ordered reader results, missing quality,
+failure/retry, version rejection, lost save acknowledgments, idempotent replay and
+history across fresh UI sessions. Desktop browser inspection is recorded in the
+[workflow guide](docs/ui-workflows.md). Production eligibility, real API/database
+restart persistence and Compose end-to-end evidence await T18/T20/T21; T24 stays open.
 
 ## Research extensions and experiments
 
