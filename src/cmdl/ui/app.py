@@ -13,9 +13,11 @@ st.title("Deskdrop")
 st.write("Discover articles, understand recommendations, and inspect metadata quality.")
 
 with st.sidebar:
-    st.header("Reader")
+    screen = st.radio("Workspace", ["Reader", "Reviewer"])
     mode = st.radio("Data source", ["Examples", "Live API"])
-    scenario = st.selectbox("Example scenario", list(SCENARIOS), disabled=mode != "Examples")
+    scenario = "Personalized"
+    if screen == "Reader":
+        scenario = st.selectbox("Example scenario", list(SCENARIOS), disabled=mode != "Examples")
     if mode == "Examples":
         st.info("Illustrative examples. These are not trained recommendations or measured quality.")
     else:
@@ -25,6 +27,12 @@ client = ReaderClient(
     os.environ.get("API_BASE_URL", "http://localhost:8000") if mode == "Live API" else None,
     scenario,
 )
+if screen == "Reviewer":
+    from cmdl.ui.reviewer import render
+
+    render(client.api_url)
+    st.stop()
+
 fixture = examples()[SCENARIOS[scenario]]["body"]
 default_user = fixture.get("person_id", "-8845298781299428018")
 with st.form("recommendations"):
