@@ -3,6 +3,7 @@
 import csv
 import hashlib
 import json
+import os
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from uuid import UUID, uuid4
@@ -10,6 +11,7 @@ from uuid import UUID, uuid4
 import psycopg
 import pytest
 from fastapi.testclient import TestClient
+from psycopg.conninfo import make_conninfo
 from psycopg.rows import dict_row
 
 from cmdl import serving as s
@@ -82,7 +84,9 @@ def reader_stack(empty_db, tmp_path, monkeypatch):
     ).fetchone()[0]
     publish(empty_db, ranker, tmp_path / "models", manifest)
     empty_db.commit()
-    dsn = empty_db.info.dsn
+    # Connection.info.dsn intentionally omits the password. Preserve the supplied
+    # test credentials rather than relying on Compose's PGPASSWORD environment.
+    dsn = make_conninfo(os.environ["CMDL_TEST_DSN"], options=empty_db.info.options)
     monkeypatch.setattr(s, "connect", lambda: psycopg.connect(dsn, row_factory=dict_row))
     monkeypatch.setattr(
         s.POOL, "submit", lambda *args: None
