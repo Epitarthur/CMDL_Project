@@ -1,4 +1,4 @@
-"""Transactional Deskdrop ingestion. No raw events are deleted or modeled here."""
+"Transactional Deskdrop ingestion. No raw events are deleted or modeled here."
 
 import hashlib
 import json
@@ -29,7 +29,7 @@ REASONS = ("unresolved", "removal_only", "pre_share", "ambiguous", "removed")
 
 
 class IngestError(ValueError):
-    """Validated sources conflict with existing normalized provenance."""
+    "Validated sources conflict with existing normalized provenance."
 
 
 def canonical_json(value: dict) -> str:
@@ -331,6 +331,9 @@ def ingest(connection: psycopg.Connection, raw_dir: Path) -> tuple[dict, bool]:
                 ).fetchone()
                 if stored != (manifest["source_url"], str(version)):
                     raise IngestError(f"{name}: stored provenance differs from the manifest")
+            from cmdl.quality.store import check_all
+
+            check_all(connection)
             return existing[0], False
         _ensure_original(connection)
         # Only identities use ON CONFLICT; immutable source rows/events are never reinserted.
@@ -365,6 +368,9 @@ def ingest(connection: psycopg.Connection, raw_dir: Path) -> tuple[dict, bool]:
                 Jsonb(report),
             ),
         )
+        from cmdl.quality.store import check_all
+
+        check_all(connection)
     return report, True
 
 

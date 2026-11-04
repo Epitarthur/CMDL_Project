@@ -4,7 +4,7 @@ from pathlib import Path
 
 from streamlit.testing.v1 import AppTest
 
-APP = Path("src/cmdl/ui/app.py").resolve()
+APP = Path("src/cmdl/ui/prototype.py").resolve()
 
 
 def reviewer():

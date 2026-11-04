@@ -7,7 +7,7 @@ from streamlit.testing.v1 import AppTest
 
 from cmdl.ui.client import examples
 
-APP = Path("src/cmdl/ui/app.py").resolve()
+APP = Path("src/cmdl/ui/prototype.py").resolve()
 
 
 def test_packaged_examples_match_approved_contract():

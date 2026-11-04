@@ -131,6 +131,18 @@ def _run_command(args) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
+    argv = sys.argv[1:] if argv is None else argv
+    if argv and argv[0] in {
+        "train",
+        "quality",
+        "evaluate",
+        "review-sample",
+        "review-metrics",
+        "benchmark",
+    }:
+        from cmdl.commands import main as application_main
+
+        return application_main(argv)
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
     check = commands.add_parser("profile", help="Verify raw CSVs and write JSON/Markdown profiles")

@@ -29,6 +29,11 @@ jobs:
       - run: uv run ruff check .
       - run: uv run ruff format --check .
       - run: uv run pytest
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify browser visibility logic
+        run: node --test tests/browser/*.mjs
       - run: uv run cmdl profile
       - name: Verify Docker services, persistence and reset
         run: uv run python scripts/smoke_compose.py

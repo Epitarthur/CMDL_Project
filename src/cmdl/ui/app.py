@@ -1,130 +1,342 @@
-"""Deskdrop reader interface, with explicit examples until product services exist."""
+"Persistent article feed and nonblocking Up next reader flow."
 
-import os
-import re
-from urllib.parse import urlsplit
+from time import monotonic
+from uuid import uuid4
 
 import streamlit as st
 
-from cmdl.ui.client import SCENARIOS, ReaderClient, ServiceError, examples
+from cmdl.quality.checks import valid_url
+from cmdl.ui.feed_visibility import card_key, render_impressions
+from cmdl.ui.live_client import APIError, matches, request
+from cmdl.ui.reading_progress import render_progress
 
-st.set_page_config(page_title="Deskdrop · Reader", page_icon="📚", layout="wide")
+st.set_page_config(page_title="CMDL · Deskdrop", page_icon="📚", layout="wide")
 st.title("Deskdrop")
-st.write("Discover articles, understand recommendations, and inspect metadata quality.")
+st.caption(
+    "Articles worth your next read · historical CI&T catalog with a separate live reading history"
+)
+state = st.session_state
+if "reader_session" not in state:
+    state.reader_session = str(uuid4())
 
 with st.sidebar:
-    screen = st.radio("Workspace", ["Reader", "Reviewer"])
-    mode = st.radio("Data source", ["Examples", "Live API"])
-    scenario = "Personalized"
-    if screen == "Reader":
-        scenario = st.selectbox("Example scenario", list(SCENARIOS), disabled=mode != "Examples")
-    if mode == "Examples":
-        st.info("Illustrative examples. These are not trained recommendations or measured quality.")
-    else:
-        st.caption("Live recommendations require the product API and published model artifacts.")
+    workspace = st.radio("Workspace", ["Reader", "Reviewer"])
+    st.caption(
+        "Real dataset and persisted services. Original Deskdrop text is shown inside the app."
+    )
+if workspace == "Reviewer":
+    from cmdl.ui.live_reviewer import render
 
-client = ReaderClient(
-    os.environ.get("API_BASE_URL", "http://localhost:8000") if mode == "Live API" else None,
-    scenario,
-)
-if screen == "Reviewer":
-    from cmdl.ui.reviewer import render
-
-    render(client.api_url)
+    render()
     st.stop()
 
-fixture = examples()[SCENARIOS[scenario]]["body"]
-default_user = fixture.get("person_id", "-8845298781299428018")
-with st.form("recommendations"):
-    person = st.text_input("User ID", value=default_user, key=f"user-{scenario}")
-    limit = st.number_input("Maximum articles", min_value=1, max_value=10, value=10)
-    submitted = st.form_submit_button("Find articles", type="primary")
+try:
+    accounts = request("GET", "/demo/accounts")["accounts"]
+except APIError as exc:
+    st.error(str(exc))
+    st.info("Setup: migrate, ingest, then train the model release. See README.md.")
+    if st.button("Retry connection"):
+        st.rerun()
+    st.stop()
 
-# Any input/context change hides old success immediately, including unsent form edits.
-identity = (mode, scenario, person, limit)
-if st.session_state.get("identity") != identity:
-    st.session_state.pop("ranking", None)
-    st.session_state.pop("failure", None)
-    st.session_state["identity"] = identity
-
-if submitted:
-    st.session_state.pop("ranking", None)
-    st.session_state.pop("failure", None)
-    if not re.fullmatch(r"-?\d+", person):
-        st.session_state["failure"] = ("Enter an exact numeric user ID, including its sign.", False)
-    else:
-        try:
-            with st.spinner("Finding articles…"):
-                st.session_state["ranking"] = client.recommend(person, int(limit))
-        except ServiceError as exc:
-            st.session_state["failure"] = (str(exc), exc.retryable)
-
-if failure := st.session_state.get("failure"):
-    st.error(failure[0])
-    if failure[1]:
-        st.caption(
-            "You can retry using Find articles. In examples, choose another scenario to recover."
-        )
-
-
-def show_quality(quality):
-    st.subheader("Metadata quality")
-    if quality["status"] != "available":
-        st.info(f"Quality unavailable · {quality.get('reason', 'not assessed')}")
-        return
-    score = quality["overall_score"]
-    st.write("Overall: partially assessed" if score is None else f"Overall: {score:.0%}")
+options = {"Anonymous": None, "New demo reader": "0"}
+options.update(
+    {
+        f"Reader {n + 1} · {a['historical_articles']} historical articles": a["person_id"]
+        for n, a in enumerate(accounts)
+    }
+)
+with st.sidebar:
+    label = st.selectbox("Demo account", list(options), index=2 if accounts else 0)
+    person = options[label]
     st.caption(
-        "Scores summarize rule checks; they are not probabilities that an article is correct."
+        "Historical interactions and new views exclude articles from "
+        "future suggestions. Reading progress is saved automatically."
     )
-    for name, dimension in quality["dimensions"].items():
-        value = dimension["score"]
-        label = "Unassessed" if value is None else f"{value:.0%}"
-        st.write(f"**{name.title()}** · {label}")
-        st.caption(
-            f"{dimension['passed_checks']}/{dimension['assessed_checks']} assessed checks passed; "
-            f"{dimension['unassessed_checks']} unassessed"
+if state.get("active_person", "unset") != person:
+    try:
+        request(
+            "POST",
+            "/reading/reset",
+            json={
+                "session_id": state.reader_session,
+                "person_id": person,
+                "navigation_id": str(uuid4()),
+            },
         )
-    for warning in quality.get("warnings", []):
-        st.warning(f"{warning['field']} · {warning['reason']}")
+    except APIError as exc:
+        st.error(str(exc))
+        st.stop()
+    for key in (
+        "opened",
+        "navigation",
+        "pending_open",
+        "feed",
+        "completion_key",
+        "estimated",
+        "estimate_evidence",
+        "estimate_retry_at",
+        "language_settings",
+        "preference_update",
+        "impressions",
+    ):
+        state.pop(key, None)
+    state.active_person = person
 
 
-if ranking := st.session_state.get("ranking"):
-    st.subheader("Your reading list")
-    st.caption(f"Historical catalog as of {ranking['context']['as_of_at']}")
-    if mode == "Examples":
-        st.caption("Example user and result limit are fixed by the selected approved scenario.")
-    if ranking["fallback_reasons"]:
-        st.info("Popularity fallback · " + ", ".join(ranking["fallback_reasons"]))
-    if ranking["short_result"]:
-        st.info(f"Only {ranking['returned_count']} eligible articles are available in this result.")
-    if not ranking["items"]:
-        st.write("No eligible articles to show. Try another user or return later.")
-    for index, item in enumerate(ranking["items"]):
-        article = item["article"]
-        metadata = article.get("metadata") or {}
-        with st.container(border=True):
-            st.subheader(f"{item['rank']}. {metadata.get('title') or 'Untitled article'}")
-            st.caption(f"{metadata.get('lang', 'Unknown language')} · {item['source']}")
-            st.write(item["explanation"]["text"])
-            url = metadata.get("url", "")
-            if urlsplit(url).scheme in ("http", "https"):
-                st.link_button("Open article", url)
-            with st.expander("Inspect article and quality"):
-                if st.button("Load details", key=f"inspect-{index}"):
-                    try:
-                        with st.spinner("Loading article details…"):
-                            detail, quality = client.inspect(item, ranking["context"])
-                        st.write((detail.get("metadata") or {}).get("text", "No text available."))
-                        show_quality(quality)
-                        with st.expander("Record references"):
-                            st.json(
-                                {
-                                    "article": detail,
-                                    "snapshot_id": ranking["context"]["snapshot_id"],
-                                }
-                            )
-                    except ServiceError as exc:
-                        st.error(str(exc))
-                        if exc.retryable:
-                            st.caption("Use Load details to retry.")
+with st.sidebar:
+    try:
+        if "language_settings" not in state:
+            params = {"session_id": state.reader_session}
+            if person is not None:
+                params["person_id"] = person
+            state.language_settings = request("GET", "/reader/preferences", params=params)
+        settings = state.language_settings
+        languages = {"Learn from my reading": "auto", "All languages": "all"}
+        names = {"en": "English", "pt": "Português"}
+        languages.update(
+            {names.get(code, code.upper()): code for code in settings["available_languages"]}
+        )
+        selection = st.selectbox(
+            "Article language",
+            list(languages),
+            index=list(languages.values()).index(settings["language"]),
+            key="language-choice-" + str(person),
+        )
+        if languages[selection] != settings["language"]:
+            pending = state.get("preference_update")
+            if not pending or pending["language"] != languages[selection]:
+                pending = {
+                    "session_id": state.reader_session,
+                    "person_id": person,
+                    "language": languages[selection],
+                    "client_request_id": str(uuid4()),
+                }
+                state.preference_update = pending
+            request("PUT", "/reader/preferences", json=pending)
+            settings["language"] = languages[selection]
+            state.pop("feed", None)
+            state.pop("preference_update", None)
+            st.rerun()
+    except APIError as exc:
+        st.error(str(exc))
+
+
+def open_item(content_id):
+    pending = state.get("pending_open")
+    if pending is None or pending["content_id"] != content_id or pending["person_id"] != person:
+        pending = {
+            "content_id": content_id,
+            "person_id": person,
+            "session_id": state.reader_session,
+            "navigation_id": str(uuid4()),
+            "client_request_id": str(uuid4()),
+            "prefetch_id": str(uuid4()),
+        }
+        state.pending_open = pending
+    opened = request("POST", "/reading/open", json=pending)
+    state.opened = opened["article"]
+    state.navigation = pending
+    state.completion_key = str(uuid4())
+    state.estimated = False
+    state.pop("estimate_evidence", None)
+    state.pop("estimate_retry_at", None)
+    state.pop("feed", None)
+    state.pop("pending_open", None)
+
+
+def card(item, key, container_key=None):
+    metadata = item["article"]["metadata"]
+    with st.container(border=True, key=container_key):
+        st.subheader(metadata["title"] or "Untitled article")
+        st.caption(metadata["lang"].upper() + " · " + item["explanation"]["text"])
+        st.write(
+            metadata["text"][:300].replace("\n", " ") + ("…" if len(metadata["text"]) > 300 else "")
+        )
+        if st.button("Read article", key=key, type="primary"):
+            try:
+                open_item(item["content_id"])
+                st.rerun()
+            except APIError as exc:
+                st.error(str(exc))
+                st.caption("Click Read article again to retry safely.")
+
+
+if "opened" not in state:
+    st.header("Your article feed")
+    if st.button("Refresh feed"):
+        state.pop("feed", None)
+    try:
+        if "feed" not in state:
+            params = {"session_id": state.reader_session, "limit": 10}
+            state.feed = request(
+                "GET", "/feed" if person is None else "/recommend/" + person, params=params
+            )
+        feed = state.feed
+        st.caption(
+            f"{feed['returned_count']} suggestions · catalog as of {feed['context']['as_of_at']}"
+        )
+        if not feed["items"]:
+            st.info(
+                "No eligible unread articles are available. Choose "
+                "another language or account, or check again later."
+            )
+        for index, item in enumerate(feed["items"]):
+            card(item, "feed-" + item["content_id"], card_key(feed["feed_id"], index))
+        report = render_impressions(feed)
+        if state.get("impressions", {}).get("feed_id") != feed["feed_id"]:
+            state.impressions = {
+                "feed_id": feed["feed_id"],
+                "pending": set(),
+                "saved": set(),
+                "retry_at": 0,
+            }
+        if report and report.get("feed_id") == feed["feed_id"]:
+            state.impressions["pending"].update(
+                set(report["content_ids"]) - state.impressions["saved"]
+            )
+
+        @st.fragment(run_every="2s")
+        def save_impressions():
+            queue = state.get("impressions")
+            if not queue or queue["feed_id"] != state.get("feed", {}).get("feed_id"):
+                return
+            if queue["pending"] and monotonic() >= queue["retry_at"]:
+                try:
+                    saved = request(
+                        "POST",
+                        "/feed/impressions",
+                        json={
+                            "session_id": state.reader_session,
+                            "person_id": person,
+                            "feed_id": queue["feed_id"],
+                            "content_ids": sorted(queue["pending"]),
+                            "visible_ms": 1000,
+                        },
+                    )
+                    queue["saved"].update(saved["recorded"])
+                    queue["pending"].difference_update(saved["recorded"])
+                except APIError:
+                    queue["retry_at"] = monotonic() + 5
+
+        save_impressions()
+    except APIError as exc:
+        st.error(str(exc))
+        if st.button("Retry feed"):
+            state.pop("feed", None)
+            st.rerun()
+else:
+    article = state.opened
+    navigation = state.navigation
+    if st.button("← Back to feed"):
+        request(
+            "POST",
+            "/reading/reset",
+            json={
+                "session_id": state.reader_session,
+                "person_id": person,
+                "navigation_id": str(uuid4()),
+            },
+        )
+        state.pop("opened", None)
+        state.pop("navigation", None)
+        st.rerun()
+    metadata = article["metadata"]
+    st.header(metadata["title"] or "Untitled article")
+    st.caption(metadata["lang"].upper())
+    if valid_url(metadata["url"]):
+        st.link_button("Original source", metadata["url"])
+    st.markdown(metadata["text"])
+    evidence = render_progress(navigation, metadata["text"])
+    if evidence and matches(evidence, navigation):
+        state.estimate_evidence = evidence
+    st.divider()
+
+    @st.fragment(run_every="1s")
+    def up_next():
+        current = state.get("navigation")
+        if not current or current["navigation_id"] != navigation["navigation_id"]:
+            return
+        evidence = state.get("estimate_evidence")
+        if not state.estimated and evidence and matches(evidence, current):
+            if monotonic() >= state.get("estimate_retry_at", 0):
+                try:
+                    request(
+                        "POST",
+                        "/reading/estimate",
+                        json={
+                            k: current[k]
+                            for k in ("content_id", "person_id", "session_id", "navigation_id")
+                        }
+                        | {
+                            k: evidence[k]
+                            for k in ("active_seconds", "end_visible", "rule_version")
+                        }
+                        | {
+                            "client_request_id": state.completion_key,
+                            "metadata_version_id": article["metadata_version_id"],
+                        },
+                    )
+                    state.estimated = True
+                except APIError:
+                    state.estimate_retry_at = monotonic() + 5
+            if not state.estimated:
+                st.caption("Reading progress could not be saved yet. Retrying automatically…")
+        st.subheader("Up next")
+        try:
+            response = request(
+                "GET",
+                "/next/" + current["prefetch_id"],
+                params={
+                    "session_id": current["session_id"],
+                    "navigation_id": current["navigation_id"],
+                },
+            )
+            if not matches(response, current):
+                return
+            if response["status"] == "pending":
+                st.info("Preparing your next article… You can keep reading.")
+            elif response["status"] == "failed":
+                st.error(response["error"])
+            elif response["result"]["items"]:
+                card(response["result"]["items"][0], "next-" + current["navigation_id"])
+            else:
+                st.info(
+                    "You have reached the end of the eligible catalog. No unread articles remain."
+                )
+            if response["status"] in ("pending", "failed") and st.button("Retry next article"):
+                request(
+                    "POST",
+                    "/next",
+                    json={
+                        k: current[k]
+                        for k in (
+                            "session_id",
+                            "person_id",
+                            "content_id",
+                            "navigation_id",
+                            "prefetch_id",
+                        )
+                    },
+                )
+                st.rerun(scope="fragment")
+        except APIError as exc:
+            st.error(str(exc))
+            if st.button("Retry next recommendation"):
+                request(
+                    "POST",
+                    "/next",
+                    json={
+                        k: current[k]
+                        for k in (
+                            "session_id",
+                            "person_id",
+                            "content_id",
+                            "navigation_id",
+                            "prefetch_id",
+                        )
+                    },
+                )
+                st.rerun(scope="fragment")
+
+    up_next()

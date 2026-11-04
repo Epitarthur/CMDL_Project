@@ -242,15 +242,21 @@ def entry(db, s, rankings, content="10", rank=1, score=1, **overrides):
 
 
 def test_empty_migration_and_repeat_are_atomic(empty_db):
-    assert migration.migrate(empty_db) == ["0001_storage_v1.sql", "0002_source_imports.sql"]
+    assert migration.migrate(empty_db) == [
+        "0001_storage_v1.sql",
+        "0002_source_imports.sql",
+        "0003_live_application.sql",
+        "0004_reading_estimates.sql",
+        "0005_reader_feedback.sql",
+    ]
     assert migration.migrate(empty_db) == []
     assert (
         empty_db.execute(
             "SELECT count(*) FROM information_schema.tables WHERE table_schema=current_schema()"
         ).fetchone()[0]
-        == 22
+        == 38
     )
-    assert empty_db.execute("SELECT count(*) FROM schema_migrations").fetchone() == (2,)
+    assert empty_db.execute("SELECT count(*) FROM schema_migrations").fetchone() == (5,)
 
 
 def test_failed_migration_rolls_back_ddl_and_history(db, tmp_path, monkeypatch):
@@ -258,12 +264,12 @@ def test_failed_migration_rolls_back_ddl_and_history(db, tmp_path, monkeypatch):
     folder.mkdir()
     for source in Path("src/cmdl/db/migrations").glob("*.sql"):
         (folder / source.name).write_bytes(source.read_bytes())
-    (folder / "0003_broken.sql").write_text("CREATE TABLE rollback_probe(id int); SELECT 1/0;")
+    (folder / "0006_broken.sql").write_text("CREATE TABLE rollback_probe(id int); SELECT 1/0;")
     monkeypatch.setattr(migration, "files", lambda _: tmp_path)
     with pytest.raises(psycopg.errors.DivisionByZero):
         migration.migrate(db)
     assert db.execute("SELECT to_regclass('rollback_probe')").fetchone() == (None,)
-    assert db.execute("SELECT count(*) FROM schema_migrations").fetchone() == (2,)
+    assert db.execute("SELECT count(*) FROM schema_migrations").fetchone() == (5,)
 
 
 def test_checksum_mismatch_is_rejected(db):
@@ -290,7 +296,7 @@ def test_concurrent_migrators_are_serialized(empty_db):
 
     with ThreadPoolExecutor(max_workers=2) as pool:
         results = list(pool.map(lambda _: apply(), range(2)))
-    assert sorted(map(len, results)) == [0, 2]
+    assert sorted(map(len, results)) == [0, 5]
 
 
 def test_ids_utc_duplicates_and_original_strings_survive(seeded):

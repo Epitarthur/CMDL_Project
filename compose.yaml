@@ -3,6 +3,8 @@ x-app: &app
   image: cmdl-dev:local
   build: .
   init: true
+  volumes:
+    - ./src:/app/src:ro
 services:
   db:
     image: postgres:17@sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3
@@ -25,6 +27,11 @@ services:
       PGDATABASE: ${POSTGRES_DB:-cmdl}
       PGUSER: ${POSTGRES_USER:-cmdl}
       PGPASSWORD: ${POSTGRES_PASSWORD:-cmdl-local-development}
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+    volumes:
+      - ./artifacts:/app/artifacts
+      - ./src:/app/src:ro
     ports:
       - "127.0.0.1:${API_PORT:-8000}:8000"
     depends_on:
@@ -61,8 +68,12 @@ services:
       PGDATABASE: ${POSTGRES_DB:-cmdl}
       PGUSER: ${POSTGRES_USER:-cmdl}
       PGPASSWORD: ${POSTGRES_PASSWORD:-cmdl-local-development}
+      HF_HOME: /app/artifacts/huggingface
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
     volumes:
       - ./data/raw:/app/data/raw:ro
       - ./artifacts:/app/artifacts
+      - ./src:/app/src:ro
 volumes:
   postgres_data:

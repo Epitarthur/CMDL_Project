@@ -8,12 +8,28 @@ version = "0.1.0"
 description = "Deskdrop recommendation and metadata quality evaluation"
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "numpy>=2.0,<3",
+    "scipy>=1.14,<2",
+    "scikit-learn>=1.5,<2",
+    "langdetect==1.0.9",
+    "pycountry>=24.6.1",
     "fastapi>=0.146.0",
     "httpx>=0.28.1",
     "psycopg[binary]>=3.3.6",
     "streamlit>=1.66.0",
     "uvicorn[standard]>=0.54.0",
 ]
+
+[project.optional-dependencies]
+semantic = ["sentence-transformers>=3,<6", "faiss-cpu>=1.9,<2", "torch>=2.5,<3"]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [project.scripts]
 cmdl = "cmdl.cli:main"

@@ -53,7 +53,7 @@ def main() -> None:
             compose("--profile", "jobs", "run", "--rm", "job", "cmdl", "migrate")
             == "Database is up to date."
         )
-        assert sql("SELECT count(*) FROM schema_migrations") == "2"
+        assert sql("SELECT count(*) FROM schema_migrations") == "5"
         assert compose(
             "--profile",
             "jobs",
@@ -120,7 +120,7 @@ def main() -> None:
             "python",
             "-c",
             "from streamlit.testing.v1 import AppTest; "
-            "a=AppTest.from_file('src/cmdl/ui/app.py').run(timeout=20); "
+            "a=AppTest.from_file('src/cmdl/ui/prototype.py').run(timeout=20); "
             "assert not a.exception; assert not a.error; "
             "a.button[0].click().run(timeout=20); "
             "assert not a.exception; assert not a.error; "
@@ -144,7 +144,7 @@ def main() -> None:
         compose("down")
         up()
         assert sql("SELECT value FROM t05_probe") == "persisted"
-        assert sql("SELECT count(*) FROM schema_migrations") == "2"
+        assert sql("SELECT count(*) FROM schema_migrations") == "5"
         assert sql("SELECT count(*) FROM source_imports") == "1"
         assert sql("SELECT count(*) FROM snapshots WHERE status='published'") == "2"
         compose("down", "--volumes")

@@ -11,6 +11,11 @@ from cmdl.api import app as service
 
 def test_connected_bootstrap_remains_not_ready(monkeypatch):
     monkeypatch.setattr(service, "database_available", lambda: True)
+
+    def missing_release(*args):
+        raise service.s.Fault("No active model", 503, "DependencyUnavailable")
+
+    monkeypatch.setattr(service.s, "runtime", missing_release)
     with TestClient(service.app) as client:
         assert client.get("/health").json() == {"status": "healthy", "database": "connected"}
         response = client.get("/ready")
