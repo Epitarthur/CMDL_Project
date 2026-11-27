@@ -9,10 +9,16 @@ const source = readFileSync(new URL('../../src/cmdl/ui/feed_visibility.js', impo
 function browser() {
     let now = 0, interval, observer, focused = true;
     let disconnected = false;
+    const listeners = new Map();
+    const events = {
+        addEventListener: (type, callback) => listeners.set(type, callback),
+        removeEventListener: type => listeners.delete(type),
+    };
     const targets = {a: {isConnected: true}, b: {isConnected: true}};
     const reports = [];
-    const window = {};
+    const window = {...events};
     const document = {
+        ...events,
         visibilityState: 'visible', hasFocus: () => focused,
         querySelector: key => targets[key],
     };
@@ -34,11 +40,14 @@ function browser() {
             setStateValue: (key, value) => reports.push(value),
         }),
         advance: ms => { for (let n = 0; n < ms; n += 250) { now += 250; interval?.(); } },
+        elapse: ms => { now += ms; },
         visible: (key, ratio) => observer([{
             target: targets[key], isIntersecting: ratio > 0, intersectionRatio: ratio,
         }]),
-        focus: value => { focused = value; },
+        focus: value => { focused = value; listeners.get(value ? 'focus' : 'blur')?.(); },
+        show: value => { document.visibilityState = value; listeners.get('visibilitychange')?.(); },
         oldTimer: () => interval,
+        listenerCount: () => listeners.size,
         get disconnected() { return disconnected; },
     };
 }
@@ -58,8 +67,8 @@ test('offscreen and briefly visible cards do not count; half-visible cards count
 
 test('hidden and unfocused time resets continuous visibility', () => {
     const b = browser(); b.mount(); b.visible('a', 1); b.advance(500);
-    b.document.visibilityState = 'hidden'; b.advance(1000);
-    b.document.visibilityState = 'visible'; b.advance(500);
+    b.show('hidden'); b.advance(1000);
+    b.show('visible'); b.advance(500);
     assert.equal(b.reports.length, 0);
     b.focus(false); b.advance(1000); b.focus(true); b.advance(750);
     assert.equal(b.reports.length, 0);
@@ -67,11 +76,31 @@ test('hidden and unfocused time resets continuous visibility', () => {
     assert.equal(b.reports.length, 1);
 });
 
+test('visibility starts at the observer callback, even just before a timer tick', () => {
+    const b = browser(); b.mount();
+    b.elapse(249); b.visible('a', 1); b.elapse(1); b.oldTimer()();
+    b.advance(750);
+    assert.equal(b.reports.length, 0);
+    b.advance(250);
+    assert.equal(b.reports.length, 1);
+});
+
+test('a hidden or unfocused interval between timer ticks breaks continuous visibility', () => {
+    for (const toggle of [(b, shown) => b.show(shown ? 'visible' : 'hidden'), (b, shown) => b.focus(shown)]) {
+        const b = browser(); b.mount(); b.visible('a', 1); b.advance(750);
+        toggle(b, false); b.elapse(50); toggle(b, true); b.advance(250);
+        assert.equal(b.reports.length, 0);
+        b.advance(750);
+        assert.equal(b.reports.length, 1);
+    }
+});
+
 test('rerenders preserve receipts; multiple visible cards are batched', () => {
     const b = browser(); const cleanup = b.mount();
     b.visible('a', 1); b.visible('b', 1); b.advance(1000);
     assert.deepEqual(Array.from(b.reports[0].content_ids), ['1', '2']);
     cleanup(); assert.equal(b.disconnected, true);
+    assert.equal(b.listenerCount(), 0);
     b.mount(); b.visible('a', 1); b.advance(2000);
     assert.equal(b.reports.length, 1);
 });

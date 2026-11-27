@@ -266,9 +266,10 @@ class Ranker:
 
     def signals(self, person=None, current=None, recent=()):
         profile = self.profiles.get(person) if person in self.warm_users else None
-        context_items = (
-            [i for i in recent if i in self.position][-20:] if person is not None else []
-        )
+        # Several events can describe the same article. Keep its latest occurrence.
+        context_items = list(
+            dict.fromkeys(i for i in reversed(tuple(recent)) if i in self.position and i != current)
+        )[:20]
         if current in self.position:
             context_items += [current]
         if context_items:
@@ -313,6 +314,7 @@ class Ranker:
     ):
         if mode not in MODELS:
             raise ValueError("Unknown ranking mode")
+        recent = tuple(recent)
         content, collaborative, semantic = self.signals(person, current, recent)
         if mode == "semantic" and self.semantic is None:
             raise ValueError("Semantic model was not trained")
@@ -337,6 +339,9 @@ class Ranker:
         banned = set(excluded) | self.consumed.get(person, set()) | set(recent)
         if current:
             banned.add(current)
+        using_history = person in self.warm_users or any(
+            i != current and i in self.position for i in recent
+        )
         ordered = np.argsort(-scores, kind="stable")
         result = []
         for index in ordered:
@@ -361,11 +366,6 @@ class Ranker:
                     "collaborative",
                 )
             else:
-                using_history = (
-                    person in self.warm_users
-                    or person is not None
-                    and any(r != current and r in self.position for r in recent)
-                )
                 text = "Text similarity to " + (
                     "this article and your reading history."
                     if current and using_history

@@ -8,25 +8,33 @@ export default function({data, setStateValue}) {
     }
     const targets = new Map();
     let stopped = false;
-    let last = performance.now();
+    const focused = () => document.visibilityState === 'visible' && document.hasFocus();
+    const tracking = () => !stopped && window[store] === progress;
+    function resetVisibility() {
+        if (!tracking()) return;
+        const start = focused() ? performance.now() : null;
+        for (const target of targets.values()) target.visibleSince = target.visible ? start : null;
+    }
     const observer = new IntersectionObserver(entries => {
+        if (!tracking()) return;
         for (const entry of entries) {
             const target = targets.get(entry.target);
             if (target) {
                 target.visible = entry.isIntersecting && entry.intersectionRatio >= 0.5;
-                if (!target.visible) target.elapsed = 0;
+                target.visibleSince = target.visible && focused()
+                    ? target.visibleSince ?? performance.now()
+                    : null;
             }
         }
     }, {threshold: [0, 0.5, 1]});
     function tick() {
-        if (stopped || window[store] !== progress) return;
+        if (!tracking()) return;
         const now = performance.now();
-        const delta = Math.min(now - last, 500);
-        last = now;
+        const isFocused = focused();
         for (const card of data.cards) {
             const element = document.querySelector(card.selector);
             if (element && !targets.has(element)) {
-                targets.set(element, {...card, visible: false, elapsed: 0});
+                targets.set(element, {...card, visible: false, visibleSince: null});
                 observer.observe(element);
             }
         }
@@ -37,12 +45,12 @@ export default function({data, setStateValue}) {
                 targets.delete(element);
                 continue;
             }
-            if (!target.visible || document.visibilityState !== 'visible' || !document.hasFocus()) {
-                target.elapsed = 0;
+            if (!target.visible || !isFocused) {
+                target.visibleSince = null;
                 continue;
             }
-            target.elapsed += delta;
-            if (target.elapsed >= 1000 && !progress.seen.has(target.content_id)) {
+            target.visibleSince ??= now;
+            if (now - target.visibleSince >= 1000 && !progress.seen.has(target.content_id)) {
                 progress.seen.add(target.content_id);
                 changed = true;
             }
@@ -51,11 +59,17 @@ export default function({data, setStateValue}) {
             feed_id: data.feed_id, content_ids: [...progress.seen],
         });
     }
+    document.addEventListener('visibilitychange', resetVisibility);
+    window.addEventListener('focus', resetVisibility);
+    window.addEventListener('blur', resetVisibility);
     const timer = setInterval(tick, 250);
     tick();
     return () => {
         stopped = true;
         clearInterval(timer);
         observer.disconnect();
+        document.removeEventListener('visibilitychange', resetVisibility);
+        window.removeEventListener('focus', resetVisibility);
+        window.removeEventListener('blur', resetVisibility);
     };
 }
