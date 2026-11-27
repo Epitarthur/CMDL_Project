@@ -63,16 +63,18 @@ def policy(connection, person, session, at):
     mode = preference(connection, person, session)
     reads = (
         connection.execute(
-            "SELECT m.lang,r.weight,EXTRACT(EPOCH FROM (%s::timestamptz-r.last_at))::float8 "
-            "AS age_seconds FROM (SELECT DISTINCT ON(content_id) content_id,metadata_version_id,"
+            "SELECT m.lang,r.weight,r.client_request_id,"
+            "EXTRACT(EPOCH FROM (%s::timestamptz-r.last_at))::float8 "
+            "AS age_seconds FROM (SELECT DISTINCT ON(content_id) "
+            "content_id,metadata_version_id,client_request_id,"
             "MAX(CASE kind WHEN 'complete' THEN 3 WHEN 'estimated_complete' THEN 2 ELSE 1 END) "
             "OVER (PARTITION BY content_id) AS weight,"
             "MAX(created_at) OVER (PARTITION BY content_id) AS last_at FROM live_reading_events "
             "WHERE " + selector + " AND created_at <= %s::timestamptz "
             "AND created_at > %s::timestamptz - INTERVAL '30 days' "
-            "ORDER BY content_id,created_at DESC) r JOIN metadata_versions m "
-            "USING(metadata_version_id) "
-            "ORDER BY r.last_at DESC LIMIT 20",
+            "ORDER BY content_id,created_at DESC,client_request_id DESC) r "
+            "JOIN metadata_versions m USING(metadata_version_id) "
+            "ORDER BY r.last_at DESC,r.client_request_id DESC LIMIT 20",
             (at, value, at, at),
         ).fetchall()
         if session is not None or person is not None
@@ -80,7 +82,8 @@ def policy(connection, person, session, at):
     )
     impressions = (
         connection.execute(
-            "SELECT i.content_id,EXTRACT(EPOCH FROM (%s::timestamptz-i.created_at))::float8 "
+            "SELECT i.content_id,i.impression_id,"
+            "EXTRACT(EPOCH FROM (%s::timestamptz-i.created_at))::float8 "
             "AS age_seconds FROM feed_impressions i JOIN feed_deliveries d USING(feed_id) WHERE d."
             + selector
             + " AND i.created_at <= %s::timestamptz "
@@ -97,6 +100,10 @@ def policy(connection, person, session, at):
         "language": mode,
         "learned_languages": languages,
         "exposures": exposures,
+        "inputs": (
+            [(str(r["client_request_id"]), r["weight"]) for r in reads],
+            sorted(str(r["impression_id"]) for r in impressions),
+        ),
         "active": mode not in ("auto", "all")
         or mode == "auto"
         and bool(languages)

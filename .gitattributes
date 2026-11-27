@@ -1,0 +1,2 @@
+# Keep the publisher's exact bytes for dataset manifest verification.
+/data/raw/*.csv -text

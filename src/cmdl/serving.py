@@ -14,7 +14,7 @@ from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
 from cmdl import feedback
-from cmdl.quality.checks import DIMENSIONS, VERSION
+from cmdl.quality.checks import DIMENSIONS, VERSION, duplicate_keys
 from cmdl.quality.store import persist
 from cmdl.reading import ESTIMATE_RULE, required_seconds
 from cmdl.recommender.feedback_policy import adjust
@@ -22,6 +22,7 @@ from cmdl.recommender.feedback_policy import adjust
 POOL = ThreadPoolExecutor(max_workers=4, thread_name_prefix="cmdl-next")
 LOCK = threading.RLock()
 LOADED = {}
+PREFETCH_MAX_AGE_SECONDS = 60
 
 
 class Fault(ValueError):
@@ -182,6 +183,14 @@ def quality(connection, version, snapshot_id):
     return result
 
 
+def recommendation_inputs(connection, person, session, snapshot_id=None):
+    release, ranker = runtime(connection, snapshot_id)
+    removed, heads = overlay(connection)
+    recent = recent_reads(connection, person, session)
+    preferences = feedback.policy(connection, person, session, now())
+    return release, ranker, removed, heads, recent, preferences
+
+
 def recommend(
     connection,
     person=None,
@@ -190,11 +199,12 @@ def recommend(
     limit=10,
     mode="quality_hybrid",
     snapshot_id=None,
+    *,
+    inputs=None,
 ):
-    release, ranker = runtime(connection, snapshot_id)
-    removed, heads = overlay(connection)
-    recent = recent_reads(connection, person, session)
-    preferences = feedback.policy(connection, person, session, now())
+    if inputs is None:
+        inputs = recommendation_inputs(connection, person, session, snapshot_id)
+    release, ranker, removed, heads, recent, preferences = inputs
     # Never join old features to a newly corrected version. Retraining restores it to ranking.
     outdated = {
         i
@@ -203,7 +213,7 @@ def recommend(
     }
     banned = removed | outdated | set(recent) | ranker.consumed.get(person, set())
     if current:
-        reference = article_record(connection, ranker, current)
+        reference = article_record(connection, ranker, current, (removed, heads))
         if reference["availability"] != "available":
             raise Fault("The current article is unavailable.")
         banned.add(current)
@@ -265,7 +275,9 @@ def recommend(
         "short_result": len(items) < limit,
         "fallback_reasons": reasons,
         "items": items,
-        "personalization": {k: v for k, v in preferences.items() if k != "exposures"},
+        "personalization": {
+            k: preferences[k] for k in ("version", "language", "learned_languages", "active")
+        },
     }
     if session is not None and current is None:
         response["feed_id"] = feedback.deliver(
@@ -444,28 +456,72 @@ def request_next(connection, payload):
     return str(request_id)
 
 
+def next_recommendation(connection, row):
+    person, session, current = (row[k] for k in ("person_id", "session_id", "content_id"))
+    inputs = recommendation_inputs(connection, person, session)
+    release, ranker, removed, heads, recent, preferences = inputs
+    revision = hashlib.sha256(
+        json.dumps(
+            [
+                str(release["release_id"]),
+                sorted(removed),
+                heads,
+                recent,
+                preferences["version"],
+                preferences["language"],
+                preferences["active"],
+                preferences["inputs"],
+            ],
+            sort_keys=True,
+        ).encode()
+    ).hexdigest()
+    previous = row["result"] or {}
+    if previous.get("revision") == revision:
+        response = previous["response"]
+        checked_at = datetime.fromisoformat(response["context"]["request_time"])
+        age = (datetime.fromisoformat(now()) - checked_at).total_seconds()
+        if 0 <= age < PREFETCH_MAX_AGE_SECONDS:
+            # Assessment reviews can change independently of the score and eligibility.
+            items = [
+                {
+                    **item,
+                    "quality": quality(
+                        connection, item["article"]["metadata_version_id"], release["snapshot_id"]
+                    ),
+                }
+                for item in response["items"]
+            ]
+            return {**response, "context": context(release, ranker), "items": items}
+
+    response = recommend(connection, person, session, current, 1, inputs=inputs)
+    connection.execute(
+        "UPDATE next_requests SET status='ready',result=%s,error=NULL "
+        "WHERE request_id=%s AND result IS NOT DISTINCT FROM %s::jsonb",
+        (
+            Jsonb({"revision": revision, "response": response}),
+            row["request_id"],
+            Jsonb(row["result"]) if row["result"] is not None else None,
+        ),
+    )
+    return response
+
+
 def prepare_next(request_id):
     try:
         with connect() as connection:
             row = connection.execute(
-                "SELECT * FROM next_requests WHERE request_id=%s", (request_id,)
+                "SELECT * FROM next_requests WHERE request_id=%s FOR UPDATE", (request_id,)
             ).fetchone()
-            if not row or not navigation_matches(connection, row):
+            if not row or row["status"] == "ready" or not navigation_matches(connection, row):
                 return
-            result = recommend(
-                connection, row["person_id"], row["session_id"], row["content_id"], 1
-            )
-            connection.execute(
-                "UPDATE next_requests SET status='ready',result=%s,error=NULL WHERE request_id=%s",
-                (Jsonb(result), request_id),
-            )
+            next_recommendation(connection, row)
     except Exception:
         with connect() as connection:
             connection.execute(
                 (
                     "UPDATE next_requests SET "
                     "status='failed',error='Recommendation preparation "
-                    "failed. Retry.' WHERE request_id=%s"
+                    "failed. Retry.' WHERE request_id=%s AND status <> 'ready'"
                 ),
                 (request_id,),
             )
@@ -483,10 +539,7 @@ def next_result(connection, request_id, session_id, navigation_id):
         or not navigation_matches(connection, row)
     ):
         raise Fault("This recommendation belongs to an older navigation.", 409, "StaleNavigation")
-    result = row["result"]
-    if row["status"] == "ready":
-        # Recheck removals, corrections, recent reads and the selected model release.
-        result = recommend(connection, row["person_id"], row["session_id"], row["content_id"], 1)
+    result = next_recommendation(connection, row) if row["status"] == "ready" else None
     return {
         "request_id": str(request_id),
         "navigation_id": str(navigation_id),
@@ -595,7 +648,24 @@ def collection_report(connection):
     }
 
 
+def correction_duplicates(connection, ranker, content_id, metadata, removed, heads):
+    peers = ranker.catalog.keys() - removed - {content_id}
+    peer_records = [ranker.catalog[item] for item in peers if item not in heads]
+    peer_versions = [heads[item] for item in peers if item in heads]
+    if peer_versions:
+        peer_records.extend(
+            connection.execute(
+                "SELECT title,url FROM metadata_versions WHERE metadata_version_id=ANY(%s::uuid[])",
+                (peer_versions,),
+            ).fetchall()
+        )
+    duplicates = duplicate_keys([*peer_records, metadata])
+    return {field: counts for field, counts in duplicates.items() if metadata[field].strip()}
+
+
 def correct_metadata(connection, content_id, payload):
+    # A concurrent correction must see the previous revision in its duplicate comparison.
+    connection.execute("SELECT pg_advisory_xact_lock(68125240716304)")
     existing = connection.execute(
         "SELECT * FROM metadata_versions WHERE metadata_version_id=%s",
         (payload["client_request_id"],),
@@ -614,7 +684,8 @@ def correct_metadata(connection, content_id, payload):
             "message": "This corrected version was already saved and checked.",
         }
     _, ranker = runtime(connection)
-    current = article_record(connection, ranker, content_id)
+    removed, heads = overlay(connection)
+    current = article_record(connection, ranker, content_id, (removed, heads))
     if current["metadata_version_id"] != str(payload["base_version_id"]):
         raise Fault("The article version changed. Reload before correcting it.")
     base = connection.execute(
@@ -654,7 +725,11 @@ def correct_metadata(connection, content_id, payload):
             checksum,
         ),
     )
-    result = persist(connection, {**metadata, "metadata_version_id": str(version)})
+    result = persist(
+        connection,
+        {**metadata, "metadata_version_id": str(version)},
+        correction_duplicates(connection, ranker, content_id, metadata, removed, heads),
+    )
     connection.execute(
         (
             "INSERT INTO live_metadata_heads VALUES (%s,%s,DEFAULT) "

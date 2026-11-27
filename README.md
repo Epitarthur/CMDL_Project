@@ -72,7 +72,9 @@ The supplied publisher version 5 contains 3,122 article lifecycle rows (3,047 sh
 
 The local serving catalog is an explicit **2017-03-01 UTC** snapshot, immediately after the supplied export, with 2,983 available articles. This initializes the demo; it is not the February test snapshot. Availability comes from source share/removal history, with strictly-before semantics and conservative equal-second handling. Separate `live_catalog_events` can remove/restore available demo items as of real request time. New app views/completions never enter source interactions, historical feature fitting or benchmark labels.
 
-Historical consumption means any of VIEW, LIKE, BOOKMARK, FOLLOW or COMMENT CREATED before the request, including observed events excluded from model fitting. New app consumption means a view, an estimated completion, or a legacy explicit completion for the selected account (or the anonymous session). All consumed/current/removed articles are filtered again before returning a prefetched result and before opening it. Anonymous identity lasts for the Streamlit session; account history persists in PostgreSQL across sessions.
+Historical consumption means any of VIEW, LIKE, BOOKMARK, FOLLOW or COMMENT CREATED before the request, including observed events excluded from model fitting. New app consumption means a view, an estimated completion, or a legacy explicit completion for the selected account (or the anonymous session). Anonymous identity lasts for the Streamlit session, and account history persists in PostgreSQL across sessions.
+
+Up next reuses the prepared ranking for up to 60 seconds while the active model, catalog, reading history and feedback inputs still match. Changes to those inputs trigger a new ranking. Reading an article still checks its current availability. Metadata corrections check normalized titles and URLs against the current versions of other available articles, and save any duplicate warnings with the new version.
 
 ## Models and quality policy
 

@@ -151,6 +151,17 @@ def test_reader_prefetch_retry_removal_review_and_leakage(empty_db, reader_stack
     s.prepare_next(first["prefetch_id"])
     next_one = client.get("/next/" + first["prefetch_id"], params=params).json()
     assert next_one["status"] == "ready"
+    assert "revision" not in next_one["result"]
+    with monkeypatch.context() as no_rerank:
+
+        def unexpected_rank(*args, **kwargs):
+            pytest.fail("An unchanged prefetch must reuse the prepared ranking")
+
+        no_rerank.setattr(Ranker, "rank", unexpected_rank)
+        s.prepare_next(first["prefetch_id"])
+        cached = client.get("/next/" + first["prefetch_id"], params=params)
+        assert cached.status_code == 200
+        assert cached.json()["result"]["items"] == next_one["result"]["items"]
     next_id = next_one["result"]["items"][0]["content_id"]
     assert next_id != first["content_id"]
     completion = {k: first[k] for k in ("session_id", "person_id", "content_id", "navigation_id")}
@@ -400,6 +411,76 @@ def test_reader_prefetch_retry_removal_review_and_leakage(empty_db, reader_stack
         ).fetchone()
         == before
     )
+
+
+def test_next_replaces_a_removed_article_and_reuses_the_new_ranking(empty_db, reader_stack):
+    client, _, _ = reader_stack
+    nav = {
+        "session_id": str(uuid4()),
+        "person_id": "1",
+        "content_id": "7",
+        "navigation_id": str(uuid4()),
+        "client_request_id": str(uuid4()),
+        "prefetch_id": str(uuid4()),
+    }
+    assert client.post("/reading/open", json=nav).status_code == 200
+    s.prepare_next(nav["prefetch_id"])
+
+    def next_content():
+        response = client.get(
+            f"/next/{nav['prefetch_id']}",
+            params={k: nav[k] for k in ("session_id", "navigation_id")},
+        )
+        assert response.status_code == 200
+        return response.json()["result"]["items"][0]["content_id"]
+
+    removed = next_content()
+    empty_db.execute(
+        "INSERT INTO live_catalog_events VALUES (%s,%s,'removed',DEFAULT,'test removal')",
+        (uuid4(), removed),
+    )
+    empty_db.commit()
+    remaining = ({"8", "9"} - {removed}).pop()
+    assert next_content() == remaining
+    cached = empty_db.execute(
+        "SELECT result FROM next_requests WHERE request_id=%s", (nav["prefetch_id"],)
+    ).fetchone()[0]
+    assert cached["response"]["items"][0]["content_id"] == remaining
+
+
+def test_corrected_metadata_checks_live_peers(reader_stack, empty_db):
+    client, _, _ = reader_stack
+
+    def correct(content_id, **changes):
+        article = client.get(f"/articles/{content_id}").json()["article"]
+        response = client.post(
+            f"/reviewer/articles/{content_id}/versions",
+            json={
+                **article["metadata"],
+                **changes,
+                "base_version_id": article["metadata_version_id"],
+                "client_request_id": str(uuid4()),
+                "reviewer_label": "duplicate-check",
+            },
+        )
+        assert response.status_code == 201
+        saved = response.json()
+        quality = client.get(f"/quality/{saved['metadata_version_id']}").json()["quality"]
+        assert quality["warnings"] == saved["quality"]["warnings"]
+        return {w["field"] for w in quality["warnings"] if w["check_id"] == "possible-duplicate"}
+
+    assert correct("1") == set()  # Keeping the same title and URL is not a duplicate.
+    assert correct("2", title="  DATA SYSTEMS 3  ", url="https://example.com/3") == {"title", "url"}
+    replacement = {"title": "Published replacement", "url": "https://example.com/replacement"}
+    assert correct("3", **replacement) == set()
+    assert correct("4", **replacement) == {"title", "url"}
+    # Only active versions and available articles contribute to new checks.
+    empty_db.execute(
+        "INSERT INTO live_catalog_events VALUES (%s,'2','removed',DEFAULT,'test removal')",
+        (uuid4(),),
+    )
+    empty_db.commit()
+    assert correct("5", title="Data systems 3", url="https://example.com/3") == set()
 
 
 def test_language_learning_preferences_and_identity_isolation(empty_db, reader_stack, monkeypatch):
